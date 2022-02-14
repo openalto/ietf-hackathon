@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+usage() {
+  echo "docker run g2-mininet [options]"
+}
+
+launch() {
+  cd /opt/mininet/g2-mininet
+  exec python3 g2Launcher.py $@
+}
+
+# Start the Open Virtual Switch Service
+service openvswitch-switch start
+
+launch $@

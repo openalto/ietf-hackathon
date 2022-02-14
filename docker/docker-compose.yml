@@ -1,0 +1,19 @@
+services:
+  g2-mininet:
+    image: g2-mininet:latest
+    extra_hosts:
+      - "sflow:127.0.0.1"
+      - "odl:127.0.0.1"
+    volumes:
+      - ../etc/g2-mininet:/opt/g2-mininet
+  sflow:
+    image: sflow/sflow-rt:latest
+    ports:
+      - "8008:8008"
+      - "6343:6343/udp"
+    network_mode: "service:g2-mininet"
+    environments:
+      - RTMEM=2G
+  odl:
+    image: odl:6.4.0
+    network_mode: "service:g2-mininet"
