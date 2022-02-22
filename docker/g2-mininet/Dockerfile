@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV MININET_REPO git://github.com/mininet/mininet
 ENV MININET_INSTALLER ./mininet/util/install.sh
-ENV INSTALLER_SWITCHES -fbinptvwyx
+ENV INSTALLER_SWITCHES -fnpv
 ENV G2_MININET_REPO git://github.com/reservoirlabs/g2-mininet
 ENV MININET_SRC /opt/mininet
 ENV G2_MININET_SRC /opt/mininet/g2-mininet
@@ -40,8 +40,9 @@ RUN \
 
 # A few changes to make the install script behave.
     && sed -e 's/sudo //g' \
+        -e 's/DEBIAN_FRONTEND=noninteractive //g' \
     	-e 's/~\//\//g' \
-    	-e 's/\(apt-get -y install\)/\1 --no-install-recommends --no-install-suggests/g' \
+    	-e 's/\(apt-get -y -q install\)/\1 --no-install-recommends --no-install-suggests/g' \
     	-i $MININET_INSTALLER \
 
 # Install script expects to find this. Easier than patching that part of the script.
@@ -57,7 +58,7 @@ RUN \
 # Clone and install g2-mininet.
     && cd $MININET_SRC \
     && git clone $G2_MININET_REPO \
-    && cp g2-mininet/pox/g2_static.py $MININET_SRC/pox/ext/ \
+    && cp g2-mininet/pox/g2_static.py $MININET_SRC/../pox/ext/ \
 
 # Clean up packages.
     && apt-get clean \

@@ -1,19 +1,27 @@
 services:
   g2-mininet:
-    image: g2-mininet:latest
+    build: g2-mininet/
     extra_hosts:
       - "sflow:127.0.0.1"
       - "odl:127.0.0.1"
+    ports:
+      - "8181:8181"
     volumes:
-      - ../etc/g2-mininet:/opt/g2-mininet
+      - /lib/modules:/lib/modules
+      - ../etc/g2-mininet:/etc/g2-mininet
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    privileged: true
+    entrypoint: /bin/bash
+    command: "-c 'service openvswitch-switch start && tail -f /dev/null'"
   sflow:
     image: sflow/sflow-rt:latest
-    ports:
-      - "8008:8008"
-      - "6343:6343/udp"
     network_mode: "service:g2-mininet"
-    environments:
+    environment:
       - RTMEM=2G
   odl:
-    image: odl:6.4.0
+    build: odl/
     network_mode: "service:g2-mininet"
+    entrypoint: /bin/bash
+    command: "-c '/opt/opendaylight/bin/start && tail -f /dev/null'"
