@@ -1,0 +1,63 @@
+{
+  "resource-cost-map": {
+    "resource-id": "default-costmap",
+    "tag": "3ee2cb7e8d63d9fab71b9b34cbf76443",
+    "meta": {
+      "dependent-vtags": [
+        {
+          "resource-id": "default-networkmap",
+          "tag": "da65eca2eb7a10ce8b059740b0b2e3f8"
+        }
+      ]
+    },
+    "map": [
+      {
+        "src": "PID0",
+        "dst-costs": [
+          {
+            "dst": "PID1",
+            "numerical-cost-value": 10
+          },
+          {
+            "dst": "PID2",
+            "numerical-cost-value": 15
+          }
+        ]
+      },
+      {
+        "src": "PID1",
+        "dst-costs": [
+          {
+            "dst": "PID0",
+            "numerical-cost-value": 10
+          },
+          {
+            "dst": "PID1",
+            "numerical-cost-value": 1
+          },
+          {
+            "dst": "PID2",
+            "numerical-cost-value": 5
+          }
+        ]
+      },
+      {
+        "src": "PID2",
+        "dst-costs": [
+          {
+            "dst": "PID0",
+            "numerical-cost-value": 15
+          },
+          {
+            "dst": "PID1",
+            "numerical-cost-value": 5
+          },
+          {
+            "dst": "PID2",
+            "numerical-cost-value": 1
+          }
+        ]
+      }
+    ]
+  }
+}
