@@ -15,11 +15,14 @@ JupterHub, please follow the steps below to set up an account.
 
    > *NOTE*: The platform uses [CILogon](https://www.cilogon.org/) to do the
    authorization. Therefore, you should provide your **institutional email**, or
-   your **ORCID**, **GitHub**, **Google**, or **Microsoft** account.
+   the email address linked to your **ORCID**, **GitHub**, **Google**, or
+   **Microsoft** account.
 
 2. Once you received the approval, you can sign up a new account on
    the JupterHub (<https://alto.nrp-nautilus.io/>) using the email address that
    you provided at step 1.
+
+   > *NOTE*: Please make sure you select the correct identity provider.
 
    ![](assets/img/cilogon-signup.png)
 
@@ -43,3 +46,6 @@ make change on `Dockerfile` of the
 [alto/alto-jupyterlab](https://gitlab.nrp-nautilus.io/alto/alto-jupyterlab)
 repo, or contact adminstrators (Jensen Zhang <<jingxuan.n.zhang@gmail.com>>,
 John Graham <<jjgraham@ucsd.edu>>) to do this.
+
+> *NOTE*: The pre-installed software environment of the current Kubernetes
+platform is still working in progess. It can be changed frequently.
