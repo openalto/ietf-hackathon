@@ -1,7 +1,7 @@
 # Enviroment Setup
 
-This is a guide to help developers to set up the basic development environment
-locally.
+This is a guide to help set up the basic development environment of ALTO over OpenDayliught on a 
+local machine.
 
 ## Prerequisite
 
@@ -20,7 +20,7 @@ $ git clone https://github.com/openalto/ietf-hackathon.git
 $ cd ietf-hackathon
 ```
 
-Then enter the `docker` directory and build all the containers
+Then enter the `docker` directory and build all the containers:
 
 ``` sh
 $ cd docker
@@ -40,7 +40,7 @@ $ docker-compose up -d
  ⠿ Container docker-sflow-1       Started           15.5s
 ```
 
-### Dealing with OpenDaylight Controller
+### Launching the OpenDaylight Controller
 
 Execute OpenDaylight from the `odl` container:
 
@@ -60,16 +60,16 @@ You can check all the features which has been already installed:
 opendaylight-user@root> feature:list -i
 ```
 
-### Dealing with ALTO Server
+### Starting & Testing the ALTO Server
 
-Let's install the `odl-alto-manual-maps` feature to test the basic functionality
+Install the `odl-alto-manual-maps` feature to test the basic functionality
 of the ALTO server:
 
 ``` sh
 opendaylight-user@root> feature:install odl-alto-core odl-alto-manual-maps
 ```
 
-First, verify all the required features were installed successfully:
+First, verify all the required features are installed successfully:
 
 ``` sh
 opendaylight-user@root> feature:list -i | grep odl-alto-
