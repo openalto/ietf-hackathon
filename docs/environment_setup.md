@@ -277,14 +277,63 @@ Clone codebase for Rucio with ALTO integration:
 $ git clone -b alto-integration https://github.com/openalto/rucio.git
 ```
 
+> *NOTE*: As the `alto-integration` branch may not be stable, you can first
+> switch to the `master` branch to do some simple tests.
+
+Build extended docker images for rucio development environment:
+
 ``` sh
-$ cd rucio
-$ docker-compose -f etc/docker/dev/docker-compose.yml up -d
+$ ./build_docker_images.sh
+```
+
+> *NOTE*: This command will build extended docker images for `rucio-dev` and
+> `xrootd`. More specifically, the extended docker images will install
+> `net-tools` and `iproute` packages on the original images. Because mininet
+> requires `ifconfig` and `ip` commands to operate network devices.
+
+Launch all docker containers:
+
+``` sh
+$ docker-compose -f docker-compose-with-rucio.yml up -d
+[+] Running 15/15
+⠿ Network docker_default       Created                     0.7s
+⠿ Container rucio              Started                     88.8s
+⠿ Container docker-mininet-1   Started                     75.1s
+⠿ Container xrd4               Started                     87.7s
+⠿ Container xrd1               Started                     71.7s
+⠿ Container xrd2               Started                     78.4s
+⠿ Container xrd3               Started                     86.8s
+⠿ Container docker-sflow-1     Started                     44.9s
+⠿ Container docker-activemq-1  Started                     81.5s
+⠿ Container docker-ruciodb-1   Started                     78.2s
+⠿ Container docker-ftsdb-1     Started                     78.9s
+⠿ Container docker-graphite-1  Started                     83.7s
+⠿ Container docker-fts-1       Started                     76.7s
+⠿ Container docker-minio-1     Started                     80.3s
+⠿ Container docker-ssh1-1      Started                     77.0s
+```
+
+Then you can start a test topology for those containers:
+
+``` sh
+$ docker-compose -f docker-compose-with-rucio.yml exec mininet python3 /utils/rucio_example.py
+```
+
+This will build the following topology:
+
+```
+              Rucio
+      1Mbps    |     5Mbps
+      25ms     |     25ms
+  s1 --------- s3 ----------- s4 -- XRD3
+  |            |              |
+  |            | 25ms         | 50ms
+  |            | 1Mbps        | 2Mbps
+  |            |              |
+ XRD1          s2 -- XRD2     s5 -- XRD4
 ```
 
 > *NOTE*: Learn more details from the [Rucio Documentation](http://rucio.cern.ch/documentation/setting_up_demo).
-
-TODO: Integrate rucio test environment with mininet.
 
 ### Testing Rucio with ALTO
 
