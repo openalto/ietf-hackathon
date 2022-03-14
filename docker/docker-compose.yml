@@ -3,9 +3,7 @@ services:
     build: g2-mininet/
     extra_hosts:
       - "sflow:127.0.0.1"
-      - "odl:127.0.0.1"
-    ports:
-      - "8181:8181"
+      # - "odl:127.0.0.1"
     volumes:
       - /lib/modules:/lib/modules
       - ../etc/g2-mininet:/etc/g2-mininet
@@ -22,6 +20,8 @@ services:
       - RTMEM=2G
   odl:
     build: odl/
-    network_mode: "service:g2-mininet"
+    # network_mode: "service:g2-mininet"
     entrypoint: /bin/bash
+    ports:
+      - "8181:8181"
     command: "-c '/opt/opendaylight/bin/start && tail -f /dev/null'"

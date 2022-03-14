@@ -1,0 +1,46 @@
+services:
+  mininet:
+    image: containernet/containernet:latest
+    extra_hosts:
+      - xrd1:10.0.0.252
+    volumes:
+      - /lib/modules:/lib/modules
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../utils:/utils
+    pid: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    privileged: true
+    entrypoint: /bin/bash
+    command: "-c 'service openvswitch-switch start && tail -f /dev/null'"
+  rucio:
+    image: ubuntu:trusty
+    container_name: rucio
+    network_mode: "service:mininet"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    entrypoint: /bin/bash
+    command: "-c 'tail -f /dev/null'"
+  xrd1:
+    image: ubuntu:trusty
+    container_name: xrd1
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    entrypoint: /bin/bash
+    command: "-c 'tail -f /dev/null'"
+  xrd2:
+    image: ubuntu:trusty
+    container_name: xrd2
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    entrypoint: /bin/bash
+    command: "-c 'tail -f /dev/null'"
+  fts-test:
+    image: ubuntu:trusty
+    network_mode: "service:mininet"
+    entrypoint: /bin/bash
+    command: "-c 'tail -f /dev/null'"
