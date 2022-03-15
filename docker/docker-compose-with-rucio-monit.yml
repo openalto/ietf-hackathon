@@ -1,0 +1,234 @@
+services:
+  mininet:
+    image: containernet/containernet:latest
+    volumes:
+      - /lib/modules:/lib/modules
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../utils:/utils
+    pid: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    privileged: true
+    entrypoint: /bin/bash
+    command: "-c 'service openvswitch-switch start && tail -f /dev/null'"
+  sflow:
+    image: sflow/sflow-rt:latest
+    network_mode: "service:mininet"
+    environment:
+      - RTMEM=2G
+  rucio:
+    image: openalto/rucio-dev
+    container_name: rucio
+    extra_hosts:
+      - "ruciodb:127.0.0.1"
+      - "graphite:127.0.0.1"
+      - "fts:127.0.0.1"
+      - "ftsdb:127.0.0.1"
+      - "xrd1:10.0.0.251"
+      - "xrd2:10.0.0.252"
+      - "xrd3:10.0.0.253"
+      - "xrd4:10.0.0.254"
+      - "minio:127.0.0.1"
+      - "activemq:127.0.0.1"
+      - "ssh1:127.0.0.1"
+      - "elasticsearch:127.0.0.1"
+      - "logstash:127.0.0.1"
+      - "kibana:127.0.0.1"
+      - "grafana:127.0.0.1"
+    ports:
+      - "127.0.0.1:8443:443"
+      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8446:8446"
+      - "127.0.0.1:8449:8449"
+      - "127.0.0.1:3306:3306"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:2222:22"
+      - "127.0.0.1:61613:61613"
+      - "127.0.0.1:8161:8161"
+      - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
+      - "127.0.0.1:5044:5044"
+      - "127.0.0.1:5601:5601"
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./rucio/tools:/opt/rucio/tools:Z
+      - ./rucio/bin:/opt/rucio/bin:Z
+      - ./rucio/lib:/opt/rucio/lib:Z
+    environment:
+      - X509_USER_CERT=/opt/rucio/etc/usercert.pem
+      - X509_USER_KEY=/opt/rucio/etc/userkey.pem
+      - RDBMS=postgres14
+    cap_add:
+      - NET_ADMIN
+  ruciodb:
+    image: docker.io/postgres:14
+    network_mode: "service:rucio"
+    environment:
+      - POSTGRES_USER=rucio
+      - POSTGRES_DB=rucio
+      - POSTGRES_PASSWORD=secret
+    command: ["-c", "fsync=off","-c", "synchronous_commit=off","-c", "full_page_writes=off"]
+  graphite:
+    image: docker.io/graphiteapp/graphite-statsd
+    network_mode: "service:rucio"
+  fts:
+    image: docker.io/rucio/fts
+    network_mode: "service:rucio"
+  ftsdb:
+    image: docker.io/mysql:8
+    network_mode: "service:rucio"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_USER=fts
+      - MYSQL_PASSWORD=fts
+      - MYSQL_ROOT_PASSWORD=fts
+      - MYSQL_DATABASE=fts
+  xrd1:
+    image: openalto/xrootd
+    container_name: xrd1
+    extra_hosts:
+      - "ruciodb:10.0.0.250"
+      - "graphite:10.0.0.250"
+      - "fts:10.0.0.250"
+      - "ftsdb:10.0.0.250"
+      - "xrd1:10.0.0.251"
+      - "xrd2:10.0.0.252"
+      - "xrd3:10.0.0.253"
+      - "xrd4:10.0.0.254"
+      - "minio:10.0.0.250"
+      - "activemq:10.0.0.250"
+      - "ssh1:10.0.0.250"
+      - "elasticsearch:10.0.0.250"
+      - "logstash:10.0.0.250"
+      - "kibana:10.0.0.250"
+      - "grafana:10.0.0.250"
+    environment:
+      - XRDPORT=1094
+    volumes:
+      - ./rucio/etc/certs/hostcert_xrd1.pem:/tmp/xrdcert.pem:Z
+      - ./rucio/etc/certs/hostcert_xrd1.key.pem:/tmp/xrdkey.pem:Z
+    cap_add:
+      - NET_ADMIN
+  xrd2:
+    image: openalto/xrootd
+    container_name: xrd2
+    extra_hosts:
+      - "ruciodb:10.0.0.250"
+      - "graphite:10.0.0.250"
+      - "fts:10.0.0.250"
+      - "ftsdb:10.0.0.250"
+      - "xrd1:10.0.0.251"
+      - "xrd2:10.0.0.252"
+      - "xrd3:10.0.0.253"
+      - "xrd4:10.0.0.254"
+      - "minio:10.0.0.250"
+      - "activemq:10.0.0.250"
+      - "ssh1:10.0.0.250"
+      - "elasticsearch:10.0.0.250"
+      - "logstash:10.0.0.250"
+      - "kibana:10.0.0.250"
+      - "grafana:10.0.0.250"
+    environment:
+      - XRDPORT=1095
+    volumes:
+      - ./rucio/etc/certs/hostcert_xrd2.pem:/tmp/xrdcert.pem:Z
+      - ./rucio/etc/certs/hostcert_xrd2.key.pem:/tmp/xrdkey.pem:Z
+    cap_add:
+      - NET_ADMIN
+  xrd3:
+    image: openalto/xrootd
+    container_name: xrd3
+    extra_hosts:
+      - "ruciodb:10.0.0.250"
+      - "graphite:10.0.0.250"
+      - "fts:10.0.0.250"
+      - "ftsdb:10.0.0.250"
+      - "xrd1:10.0.0.251"
+      - "xrd2:10.0.0.252"
+      - "xrd3:10.0.0.253"
+      - "xrd4:10.0.0.254"
+      - "minio:10.0.0.250"
+      - "activemq:10.0.0.250"
+      - "ssh1:10.0.0.250"
+      - "elasticsearch:10.0.0.250"
+      - "logstash:10.0.0.250"
+      - "kibana:10.0.0.250"
+      - "grafana:10.0.0.250"
+    environment:
+      - XRDPORT=1096
+    volumes:
+      - ./rucio/etc/certs/hostcert_xrd3.pem:/tmp/xrdcert.pem:Z
+      - ./rucio/etc/certs/hostcert_xrd3.key.pem:/tmp/xrdkey.pem:Z
+    cap_add:
+      - NET_ADMIN
+  xrd4:
+    image: openalto/xrootd
+    container_name: xrd4
+    extra_hosts:
+      - "ruciodb:10.0.0.250"
+      - "graphite:10.0.0.250"
+      - "fts:10.0.0.250"
+      - "ftsdb:10.0.0.250"
+      - "xrd1:10.0.0.251"
+      - "xrd2:10.0.0.252"
+      - "xrd3:10.0.0.253"
+      - "xrd4:10.0.0.254"
+      - "minio:10.0.0.250"
+      - "activemq:10.0.0.250"
+      - "ssh1:10.0.0.250"
+      - "elasticsearch:10.0.0.250"
+      - "logstash:10.0.0.250"
+      - "kibana:10.0.0.250"
+      - "grafana:10.0.0.250"
+    environment:
+      - XRDPORT=1097
+    volumes:
+      - ./rucio/etc/certs/hostcert_xrd4.pem:/tmp/xrdcert.pem:Z
+      - ./rucio/etc/certs/hostcert_xrd4.key.pem:/tmp/xrdkey.pem:Z
+    cap_add:
+      - NET_ADMIN
+  minio:
+    image: docker.io/minio/minio
+    network_mode: "service:rucio"
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+    volumes:
+      - ./rucio/certs/hostcert_minio.pem:/root/.minio/certs/public.crt:Z
+      - ./rucio/certs/hostcert_minio.key.pem:/root/.minio/certs/private.key:Z
+    command: ["server", "/data"]
+  activemq:
+    image: docker.io/webcenter/activemq:latest
+    network_mode: "service:rucio"
+    environment:
+      - ACTIVEMQ_CONFIG_NAME=activemq
+      - ACTIVEMQ_CONFIG_DEFAULTACCOUNT=false
+      - ACTIVEMQ_USERS_fts=supersecret
+      - ACTIVEMQ_GROUPS_writes=fts
+      - ACTIVEMQ_USERS_receiver=supersecret
+      - ACTIVEMQ_GROUPS_reads=receiver
+      - ACTIVEMQ_CONFIG_SCHEDULERENABLED=true
+  ssh1:
+    image: docker.io/rucio/ssh
+    network_mode: "service:rucio"
+    volumes:
+      - ./rucio/etc/certs/ssh/ruciouser_sshkey.pub:/tmp/sshkey.pub:Z
+  elasticsearch:
+    image: docker.io/elasticsearch:7.4.0
+    network_mode: "service:rucio"
+    environment:
+      - discovery.type=single-node
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:7.3.2
+    network_mode: "service:rucio"
+    command: bash -c "logstash-plugin install logstash-input-stomp ; /usr/local/bin/docker-entrypoint"
+    volumes:
+      - ./rucio/etc/docker/dev/pipeline.conf:/usr/share/logstash/pipeline/pipeline.conf:Z
+  kibana:
+    image: docker.io/kibana:7.4.0
+    network_mode: "service:rucio"
+  grafana:
+    image: docker.io/grafana/grafana:latest
+    network_mode: "service:rucio"

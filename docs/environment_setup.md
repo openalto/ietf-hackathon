@@ -293,6 +293,10 @@ $ ./build_docker_images.sh
 
 Launch all docker containers:
 
+> *NOTE*: You can use either `docker-compose-with-rucio.yml` or
+> `docker-compose-with-rucio-monit.yml`. The later one will provide more
+> containers for monitoring purpose.
+
 ``` sh
 $ docker-compose -f docker-compose-with-rucio.yml up -d
 [+] Running 15/15
@@ -317,6 +321,19 @@ Then you can start a test topology for those containers:
 
 ``` sh
 $ docker-compose -f docker-compose-with-rucio.yml exec mininet python3 /utils/rucio_example.py
+  .
+  .
+  .
+*** Testing connectivity
+rc -> xrd1 xrd2 xrd3 xrd4
+xrd1 -> rc xrd2 xrd3 xrd4
+xrd2 -> rc xrd1 xrd3 xrd4
+xrd3 -> rc xrd1 xrd2 xrd4
+xrd4 -> rc xrd1 xrd2 xrd3
+*** Results: 0% dropped (20/20 received)
+*** Running CLI
+*** Starting CLI:
+containernet>
 ```
 
 This will build the following topology:
@@ -333,8 +350,39 @@ This will build the following topology:
  XRD1          s2 -- XRD2     s5 -- XRD4
 ```
 
+After the topology built, you can access the rucio node and RSE nodes from the
+mininet shell.
+
+Then you can set up the demo rucio datasets and replicas as follows:
+
+```sh
+containernet> rc tools/run_tests_docker.sh
+ .
+ .
+ .
+containernet> rc rucio list-rules --account root
+ID                                ACCOUNT    SCOPE:NAME      STATE[OK/REPL/STUCK]    RSE_EXPRESSION    COPIES    EXPIRES (UTC)    CREATED (UTC)
+--------------------------------  ---------  --------------  ----------------------  ----------------  --------  ---------------  -------------------
+9833c3d622ab47c0a091e6ce26301b21  root       test:file1      OK[1/0/0]               XRD1              1                          2022-03-15 11:23:33
+e8153a8284c34fde8a3af87c4e448c7a  root       test:file2      OK[1/0/0]               XRD1              1                          2022-03-15 11:25:31
+eb835a0fe13a468283e28ab19d1fa17f  root       test:file3      OK[1/0/0]               XRD2              1                          2022-03-15 11:27:54
+04911000669b4b559f7ae7864071d567  root       test:file4      OK[1/0/0]               XRD2              1                          2022-03-15 11:29:42
+df5cbfe190a1420e85ecc1ec908e657d  root       test:container  REPLICATING[0/4/0]      XRD3              1                          2022-03-15 11:31:43
+```
+
+You can also access those nodes using `docker exec` directly:
+
+```sh
+$ docker-compose -f docker-compose-with-rucio.yml exec rucio /bin/bash
+# rucio add-rule test:container 1 XRD4
+```
+
 > *NOTE*: Learn more details from the [Rucio Documentation](http://rucio.cern.ch/documentation/setting_up_demo).
 
 ### Testing Rucio with ALTO
+
+TBD.
+
+### Creating custom topology using G2-Mininet extension
 
 TBD.

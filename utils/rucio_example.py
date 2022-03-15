@@ -29,7 +29,7 @@ info('*** Adding controller\n')
 net.addController('c0')
 
 info('*** Adding docker containers\n')
-rucio = net.addHost('rucio', ip='10.0.0.250', cls=DynamicDocker)
+rucio = net.addHost('rc', cname='rucio', ip='10.0.0.250', cls=DynamicDocker)
 xrd1 = net.addHost('xrd1', ip='10.0.0.251', cls=DynamicDocker)
 xrd2 = net.addHost('xrd2', ip='10.0.0.252', cls=DynamicDocker)
 xrd3 = net.addHost('xrd3', ip='10.0.0.253', cls=DynamicDocker)
