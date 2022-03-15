@@ -283,7 +283,7 @@ $ git clone -b alto-integration https://github.com/openalto/rucio.git
 Build extended docker images for rucio development environment:
 
 ``` sh
-$ ./build_docker_images.sh
+$ make build-rucio
 ```
 
 > *NOTE*: This command will build extended docker images for `rucio-dev` and
@@ -384,5 +384,11 @@ $ docker-compose -f docker-compose-with-rucio.yml exec rucio /bin/bash
 TBD.
 
 ### Creating custom topology using G2-Mininet extension
+
+Build the docker image for containernet with G2-Mininet extension:
+
+```sh
+$ make build-g2-mininet
+```
 
 TBD.
