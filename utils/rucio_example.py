@@ -3,12 +3,15 @@
 This is a simple example to demostrate rucio with containernet.
 """
 from node_ext import DynamicDocker
-from mininet.net import Containernet
+from sflow import wrapper
+from mininet.net import Mininet, Containernet
 from mininet.node import Controller
 from mininet.cli import CLI
 from mininet.link import TCLink
 from mininet.log import info, setLogLevel
 setLogLevel('info')
+
+setattr(Mininet, 'start', wrapper(Mininet.__dict__['start']))
 
 """
 Create the following topology:

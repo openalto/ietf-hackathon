@@ -519,6 +519,25 @@ $ docker-compose -f docker-compose-with-rucio-monit.yml restart
 $ docker-compose -f docker-compose-with-rucio-monit.yml exec mininet python3 /utils/rucio_example.py
 ```
 
+### Monitoring Traffic
+
+The environment has already integrate [sflow-rt]. To enable traffic monitoring,
+it is quite simple. You can simply use [mininet-dashboard] to show the
+real-time traffic.
+
+Use the following command to install the mininet-dashboard:
+
+```sh
+$ docker-compose -f docker-compose-with-rucio-monit.yml exec sflow /sflow-rt/get-app.sh sflow-rt mininet-dashboard
+```
+
+Then you can go to your web browser to see the dashboard at
+<http://localhost:8008/app/mininet-dashboard/html/>.
+
+[sflow-rt]: https://sflow-rt.com/download.php
+
+[mininet-dashboard]: https://github.com/sflow-rt/mininet-dashboard
+
 ### Creating custom topology using G2-Mininet extension
 
 Build the docker image for containernet with G2-Mininet extension:
