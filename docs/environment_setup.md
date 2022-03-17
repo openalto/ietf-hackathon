@@ -1,7 +1,23 @@
 # Enviroment Setup
 
-This is a guide to help set up the basic development environment of ALTO over OpenDayliught on a 
-local machine.
+This is a guide to help set up the basic development environment of IETF
+Hackathon on a local **Linux** machine.
+
+The environment will include the following components:
+
+- [ALTO server over OpenDaylight][sextant]
+- [ALTO client library][alto]
+- [Containernet] (a Mininet extension for Docker) with [G2-Mininet] (another Mininet
+  extension to simplfy network simulation workflow)
+- [sflow-rt]
+- [Rucio demo environment][rucio-demo] (including all the development, storage and monitoring
+  containers for Rucio tests)
+
+[sextant]: https://github.com/openalto/sextant
+[alto]: https://github.com/openalto/alto
+[Containernet]: https://github.com/containernet/containernet
+[G2-Mininet]: https://github.com/reservoirlabs/g2-mininet/
+[rucio-demo]: http://rucio.cern.ch/documentation/setting_up_demo
 
 ## Prerequisite
 
@@ -11,6 +27,8 @@ Make sure you have the following required tools and software packages installed:
 - `docker-compose`: <https://docs.docker.com/compose/install/>
 - `openswitch-switch`: <https://www.openvswitch.org/download/>
 
+> *NOTE*: `openvswitch` is not supported by Mac OSX and Windows. If you are
+> using a Mac or Windows machine, please install a Linux VM first.
 ## Building Basic Docker Containers
 
 First, clone this repo to your own machine:
@@ -532,7 +550,9 @@ $ docker-compose -f docker-compose-with-rucio-monit.yml exec sflow /sflow-rt/get
 ```
 
 Then you can go to your web browser to see the dashboard at
-<http://localhost:8008/app/mininet-dashboard/html/>.
+<http://localhost:8008/app/mininet-dashboard/html/>:
+
+![mininet-dashboard](assets/img/sflow-rt-mininet-dashboard.png)
 
 [sflow-rt]: https://sflow-rt.com/download.php
 
