@@ -274,11 +274,15 @@ mininet>
 Clone codebase for Rucio with ALTO integration:
 
 ``` sh
-$ git clone -b alto-integration https://github.com/openalto/rucio.git
+$ git clone -b ietf-hackathon-113 https://github.com/openalto/rucio.git
+$ git clone https://github.com/openalto/alto.git
 ```
 
-> *NOTE*: As the `alto-integration` branch may not be stable, you can first
-> switch to the `master` branch to do some simple tests.
+> *NOTE*: [`ietf-hackathon-113`][ietf-hackathon-113] is a checkpoint of a
+> modified rucio version for demo purpose. The `feature-*` branches will
+> include changes to be merged into upstream rucio source code in the future.
+
+[ietf-hackathon-113]: https://github.com/openalto/rucio/tree/ietf-hackathon-113
 
 Build extended docker images for rucio development environment:
 
@@ -299,28 +303,31 @@ Launch all docker containers:
 
 ``` sh
 $ docker-compose -f docker-compose-with-rucio.yml up -d
-[+] Running 15/15
-⠿ Network docker_default       Created                     0.7s
-⠿ Container rucio              Started                     88.8s
-⠿ Container docker-mininet-1   Started                     75.1s
-⠿ Container xrd4               Started                     87.7s
-⠿ Container xrd1               Started                     71.7s
-⠿ Container xrd2               Started                     78.4s
-⠿ Container xrd3               Started                     86.8s
-⠿ Container docker-sflow-1     Started                     44.9s
-⠿ Container docker-activemq-1  Started                     81.5s
-⠿ Container docker-ruciodb-1   Started                     78.2s
-⠿ Container docker-ftsdb-1     Started                     78.9s
-⠿ Container docker-graphite-1  Started                     83.7s
-⠿ Container docker-fts-1       Started                     76.7s
-⠿ Container docker-minio-1     Started                     80.3s
-⠿ Container docker-ssh1-1      Started                     77.0s
+[+] Running 18/18
+ ⠿ Container xrd3                    Started                       71.6s
+ ⠿ Container docker-mininet-1        Started                        8.9s
+ ⠿ Container xrd1                    Started                       78.7s
+ ⠿ Container rucio                   Started                        9.3s
+ ⠿ Container xrd2                    Started                       75.2s
+ ⠿ Container xrd4                    Started                       77.3s
+ ⠿ Container docker-sflow-1          Started                       25.9s
+ ⠿ Container docker-activemq-1       Started                       29.9s
+ ⠿ Container docker-fts-1            Started                       60.5s
+ ⠿ Container docker-ruciodb-1        Started                       22.1s
+ ⠿ Container docker-kibana-1         Started                       22.4s
+ ⠿ Container docker-ftsdb-1          Started                       53.3s
+ ⠿ Container docker-logstash-1       Started                       58.2s
+ ⠿ Container docker-ssh1-1           Started                       31.5s
+ ⠿ Container docker-minio-1          Started                       27.1s
+ ⠿ Container docker-grafana-1        Started                       37.0s
+ ⠿ Container docker-graphite-1       Started                       50.4s
+ ⠿ Container docker-elasticsearch-1  Started                       39.5s
 ```
 
 Then you can start a test topology for those containers:
 
 ``` sh
-$ docker-compose -f docker-compose-with-rucio.yml exec mininet python3 /utils/rucio_example.py
+$ docker-compose -f docker-compose-with-rucio-monit.yml exec mininet python3 /utils/rucio_example.py
   .
   .
   .
@@ -356,32 +363,161 @@ mininet shell.
 Then you can set up the demo rucio datasets and replicas as follows:
 
 ```sh
-containernet> rc tools/run_tests_docker.sh
+containernet> rc tools/run_tests_docker.sh -ir
  .
  .
  .
 containernet> rc rucio list-rules --account root
 ID                                ACCOUNT    SCOPE:NAME      STATE[OK/REPL/STUCK]    RSE_EXPRESSION    COPIES    EXPIRES (UTC)    CREATED (UTC)
 --------------------------------  ---------  --------------  ----------------------  ----------------  --------  ---------------  -------------------
-9833c3d622ab47c0a091e6ce26301b21  root       test:file1      OK[1/0/0]               XRD1              1                          2022-03-15 11:23:33
-e8153a8284c34fde8a3af87c4e448c7a  root       test:file2      OK[1/0/0]               XRD1              1                          2022-03-15 11:25:31
-eb835a0fe13a468283e28ab19d1fa17f  root       test:file3      OK[1/0/0]               XRD2              1                          2022-03-15 11:27:54
-04911000669b4b559f7ae7864071d567  root       test:file4      OK[1/0/0]               XRD2              1                          2022-03-15 11:29:42
-df5cbfe190a1420e85ecc1ec908e657d  root       test:container  REPLICATING[0/4/0]      XRD3              1                          2022-03-15 11:31:43
+f732a820108b4fe59902fbbb8e08850a  root       test:file1      OK[1/0/0]               XRD1              1                          2022-03-16 12:54:59
+a7675fa9cbbe45c8ae130e442995afaa  root       test:file2      OK[1/0/0]               XRD1              1                          2022-03-16 12:56:55
+07724ab6c06640138db0f145ea78616b  root       test:file3      OK[1/0/0]               XRD2              1                          2022-03-16 12:58:37
+f589161cd00b4cb1b0eda9d7d2479617  root       test:file4      OK[1/0/0]               XRD2              1                          2022-03-16 13:00:20
+d5635b9d97ae42b59b64bd5215bc6e20  root       test:container  REPL[0/4/0]             XRD3              1                          2022-03-16 13:02:17
 ```
 
 You can also access those nodes using `docker exec` directly:
 
 ```sh
-$ docker-compose -f docker-compose-with-rucio.yml exec rucio /bin/bash
-# rucio add-rule test:container 1 XRD4
+$ docker-compose -f docker-compose-with-rucio-monit.yml exec rucio /bin/bash
+[root@cf3ad7061320 rucio]#
 ```
+
+Let's add another replica rule to replicate all the files on XRD4:
+
+```sh
+[root@cf3ad7061320 rucio]# rucio add-rule test:container 1 XRD4
+```
+
+Now, each test files will have 3 replicas. But the replicas on XRD3 and XRD4
+are still held by Rucio:
+
+```sh
+[root@cf3ad7061320 rucio]# rucio list-rules --account root
+ID                                ACCOUNT    SCOPE:NAME      STATE[OK/REPL/STUCK]    RSE_EXPRESSION    COPIES    EXPIRES (UTC)    CREATED (UTC)
+--------------------------------  ---------  --------------  ----------------------  ----------------  --------  ---------------  -------------------
+f732a820108b4fe59902fbbb8e08850a  root       test:file1      OK[1/0/0]               XRD1              1                          2022-03-16 12:54:59
+a7675fa9cbbe45c8ae130e442995afaa  root       test:file2      OK[1/0/0]               XRD1              1                          2022-03-16 12:56:55
+07724ab6c06640138db0f145ea78616b  root       test:file3      OK[1/0/0]               XRD2              1                          2022-03-16 12:58:37
+f589161cd00b4cb1b0eda9d7d2479617  root       test:file4      OK[1/0/0]               XRD2              1                          2022-03-16 13:00:20
+d5635b9d97ae42b59b64bd5215bc6e20  root       test:container  REPL[0/4/0]             XRD3              1                          2022-03-16 13:02:17
+68176892d26a4801829b5d1cd98cc5c1  root       test:container  REPL[0/4/0]             XRD4              1                          2022-03-16 14:25:07
+```
+
+We need to start daemons to handle the replica rules:
+
+```sh
+[root@cf3ad7061320 rucio]# run_daemons
+```
+
+Wait for a while, all the replicas will be transferred:
+
+```sh
+containernet> rc rucio list-rules --account root
+ID                                ACCOUNT    SCOPE:NAME      STATE[OK/REPL/STUCK]    RSE_EXPRESSION    COPIES    EXPIRES (UTC)    CREATED (UTC)
+--------------------------------  ---------  --------------  ----------------------  ----------------  --------  ---------------  -------------------
+f732a820108b4fe59902fbbb8e08850a  root       test:file1      OK[1/0/0]               XRD1              1                          2022-03-16 12:54:59
+a7675fa9cbbe45c8ae130e442995afaa  root       test:file2      OK[1/0/0]               XRD1              1                          2022-03-16 12:56:55
+07724ab6c06640138db0f145ea78616b  root       test:file3      OK[1/0/0]               XRD2              1                          2022-03-16 12:58:37
+f589161cd00b4cb1b0eda9d7d2479617  root       test:file4      OK[1/0/0]               XRD2              1                          2022-03-16 13:00:20
+d5635b9d97ae42b59b64bd5215bc6e20  root       test:container  OK[4/0/0]               XRD3              1                          2022-03-16 13:02:17
+68176892d26a4801829b5d1cd98cc5c1  root       test:container  OK[4/0/0]               XRD4              1                          2022-03-16 14:25:07
+```
+
+> *NOTE*: The transfer will usually not take too long. It usually can be
+> finished in 5 min. If you feel it takes too long, you make manually run the
+> schedule daemon to make sure the state be synchronized:
+>
+> ```sh
+> containernet> rc rucio-conveyor-poller --run-once --older-than 0
+> containernet> rc rucio-conveyor-finisher --run-once
+> ```
 
 > *NOTE*: Learn more details from the [Rucio Documentation](http://rucio.cern.ch/documentation/setting_up_demo).
 
 ### Testing Rucio with ALTO
 
-TBD.
+Since you have learnt how to set up the environment. Let's see how to test your
+changes to Rucio and ALTO code.
+
+If you want Rucio to use ALTO client library, you should enter the rucio
+container and install the ALTO client first:
+
+```sh
+$ docker-compose -f docker-compose-with-rucio-monit.yml exec rucio /bin/bash
+[root@cf3ad7061320 rucio]# cd /opt/alto
+[root@cf3ad7061320 alto]# pip install .
+```
+
+> *NOTE*: Every time when you modified the ALTO client library code, if you
+> want to make it effective, you should repeat the commands above.
+
+Then, you can start a test ALTO server inside the rucio container:
+
+```sh
+[root@cf3ad7061320 alto]# cd /opt/alto/etc
+[root@cf3ad7061320 etc]# cp alto.conf.test alto.conf
+[root@cf3ad7061320 tools]# cd /opt/alto/tools
+[root@cf3ad7061320 tools]# python server.py
+* Serving Flask app "alto-testserver" (lazy loading)
+* Environment: production
+  WARNING: This is a development server. Do not use it in a production deployment.
+  Use a production WSGI server instead.
+* Debug mode: off
+* Running on http://127.0.0.1:8181/ (Press CTRL+C to quit)
+```
+
+Then you can switch to another rucio container or shell to test the ALTO-based
+replica sorter:
+
+```sh
+containernet> rc rucio list-file-replicas --sort=alto --metalink test:file1
+<?xml version="1.0" encoding="UTF-8"?>
+<metalink xmlns="urn:ietf:params:xml:ns:metalink">
+ <file name="file1">
+  <identity>test:file1</identity>
+  <hash type="adler32">0f837543</hash>
+  <hash type="md5">ed645d9433d30e458d6f757749206747</hash>
+  <size>10485760</size>
+  <glfn name="/atlas/rucio/test:file1"></glfn>
+  <url location="XRD3" domain="wan" priority="1" client_extract="false">root://xrd3:1096//rucio/test/80/25/file1</url>
+  <url location="XRD4" domain="wan" priority="2" client_extract="false">root://xrd4:1097//rucio/test/80/25/file1</url>
+  <url location="XRD1" domain="wan" priority="3" client_extract="false">root://xrd1:1094//rucio/test/80/25/file1</url>
+ </file>
+</metalink>
+
+containernet> rc rucio download --dir /tmp --replica-sort alto test:file1
+2022-03-17 01:39:53,721 INFO    Processing 1 item(s) for input
+2022-03-17 01:39:53,880 INFO    No preferred protocol impl in rucio.cfg: No section: 'download'
+2022-03-17 01:39:53,880 INFO    Using main thread to download 1 file(s)
+2022-03-17 01:39:53,880 INFO    Preparing download of test:file1
+2022-03-17 01:39:53,897 INFO    Trying to download with root and timeout of 80s from XRD3: test:file1
+2022-03-17 01:39:55,492 INFO    Using PFN: root://xrd3:1096//rucio/test/80/25/file1
+2022-03-17 01:40:41,105 INFO    File test:file1 successfully downloaded. 10.486 MB in 44.73 seconds = 0.23 MBps
+----------------------------------
+Download summary
+----------------------------------------
+DID test:file1
+Total files (DID):                            1
+Total files (filtered):                       1
+Downloaded files:                             1
+Files already found locally:                  0
+Files that cannot be downloaded:              0
+```
+
+You can also modify the Rucio code. After you did this, you may need to restart
+the containers to make it effective. You need to stop the mininet first, and
+then restart the containers, and the rebuild the mininet topology:
+
+```sh
+containernet> <CTRL-D>
+$ docker-compose -f docker-compose-with-rucio-monit.yml restart
+ .
+ .
+ .
+$ docker-compose -f docker-compose-with-rucio-monit.yml exec mininet python3 /utils/rucio_example.py
+```
 
 ### Creating custom topology using G2-Mininet extension
 
