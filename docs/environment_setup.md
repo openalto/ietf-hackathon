@@ -320,10 +320,11 @@ Launch all docker containers:
 > containers for monitoring purpose.
 
 ``` sh
-$ docker-compose -f docker-compose-with-rucio.yml up -d
-[+] Running 18/18
+$ docker-compose -f docker-compose-with-rucio-monit.yml up -d
+[+] Running 19/19
  ⠿ Container xrd3                    Started                       71.6s
  ⠿ Container docker-mininet-1        Started                        8.9s
+ ⠿ Container docker-odl-1            Started                       57.5s
  ⠿ Container xrd1                    Started                       78.7s
  ⠿ Container rucio                   Started                        9.3s
  ⠿ Container xrd2                    Started                       75.2s

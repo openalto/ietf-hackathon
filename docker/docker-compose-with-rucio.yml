@@ -5,6 +5,9 @@ services:
       - /lib/modules:/lib/modules
       - /var/run/docker.sock:/var/run/docker.sock
       - ../utils:/utils
+    ports:
+      - "127.0.0.1:8008:8008"
+      - 8181:8181
     pid: host
     cap_add:
       - NET_ADMIN
@@ -17,8 +20,17 @@ services:
     network_mode: "service:mininet"
     environment:
       - RTMEM=2G
+    volumes:
+      - ./sflow-apps:/sflow-rt/app
+  odl:
+    image: openalto/odl:0.8.4
+    build: odl/
+    network_mode: "service:mininet"
+    entrypoint: /bin/bash
+    command: "-c '/opt/opendaylight/bin/start && tail -f /dev/null'"
   rucio:
     image: openalto/rucio-dev
+    build: rucio-containers/dev/
     container_name: rucio
     extra_hosts:
       - "ruciodb:127.0.0.1"
@@ -77,6 +89,7 @@ services:
       - MYSQL_DATABASE=fts
   xrd1:
     image: openalto/xrootd
+    build: rucio-containers/dev/
     container_name: xrd1
     extra_hosts:
       - "ruciodb:10.0.0.250"
@@ -99,6 +112,8 @@ services:
       - NET_ADMIN
   xrd2:
     image: openalto/xrootd
+    depends_on:
+      - xrd1
     container_name: xrd2
     extra_hosts:
       - "ruciodb:10.0.0.250"
@@ -121,6 +136,8 @@ services:
       - NET_ADMIN
   xrd3:
     image: openalto/xrootd
+    depends_on:
+      - xrd1
     container_name: xrd3
     extra_hosts:
       - "ruciodb:10.0.0.250"
@@ -143,6 +160,8 @@ services:
       - NET_ADMIN
   xrd4:
     image: openalto/xrootd
+    depends_on:
+      - xrd1
     container_name: xrd4
     extra_hosts:
       - "ruciodb:10.0.0.250"

@@ -1,5 +1,6 @@
 services:
   g2-mininet:
+    image: openalto/g2-mininet
     build: g2-mininet/
     extra_hosts:
       - "sflow:127.0.0.1"
@@ -19,6 +20,7 @@ services:
     environment:
       - RTMEM=2G
   odl:
+    image: openalto/odl:0.8.4
     build: odl/
     # network_mode: "service:g2-mininet"
     entrypoint: /bin/bash
