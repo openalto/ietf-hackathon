@@ -2,6 +2,7 @@
 """
 This is a simple example to demostrate rucio with containernet.
 """
+# from alto_server import config_server
 from node_ext import DynamicDocker
 from sflow import wrapper
 from mininet.net import Mininet, Containernet
@@ -57,6 +58,10 @@ net.addLink(xrd4, s5)
 net.addLink(s4, s5, cls=TCLink, delay='50ms', bw=2)
 info('*** Starting network\n')
 net.start()
+
+info('*** Configuring ALTO server\n')
+# config_server(net)
+
 info('*** Testing connectivity\n')
 net.ping([rucio, xrd1, xrd2, xrd3, xrd4])
 info('*** Running CLI\n')

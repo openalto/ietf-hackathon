@@ -1,0 +1,10 @@
+FROM containernet/containernet:latest
+LABEL org.opencontainers.image.authors="Jensen Zhang <hack@jensen-zhang.site>"
+
+ENV MININET_INSTALLER util/install.sh
+ENV INSTALLER_SWITCHES -p
+
+# Update and install minimal.
+RUN $MININET_INSTALLER $INSTALLER_SWITCHES
+
+VOLUME ["/etc/g2-mininet"]

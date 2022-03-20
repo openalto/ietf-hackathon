@@ -1,10 +1,16 @@
 services:
   mininet:
-    image: containernet/containernet:latest
+    image: openalto/g2-mininet:minimal
+    build:
+      context: ./g2-mininet
+      dockerfile: Dockerfile.minimal
     volumes:
       - /lib/modules:/lib/modules
       - /var/run/docker.sock:/var/run/docker.sock
       - ../utils:/utils
+      - ../etc/g2-mininet:/etc/g2-mininet
+      - ./g2-mininet/g2-mininet:/containernet/g2-mininet
+      - ./g2-mininet/g2-mininet/pox/g2_static.py:/containernet/pox/ext/g2_static.py
     ports:
       - "127.0.0.1:8008:8008"
       - 8181:8181
