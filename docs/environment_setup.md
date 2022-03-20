@@ -1,16 +1,16 @@
 # Enviroment Setup
 
-This is a guide to help set up the basic development environment of IETF
-Hackathon on a local **Linux** machine.
+This is a guide to help set up the basic development environment of ALTO's IETF
+113 Hackathon on a local **Linux** machine.
 
 The environment will include the following components:
 
 - [ALTO server over OpenDaylight][sextant]
 - [ALTO client library][alto]
 - [Containernet] (a Mininet extension for Docker) with [G2-Mininet] (another Mininet
-  extension to simplfy network simulation workflow)
+  extension to simplfy the network configuration setup and performance metrics extraction)
 - [sflow-rt]
-- [Rucio demo environment][rucio-demo] (including all the development, storage and monitoring
+- [Rucio demo environment][rucio-demo] (development, storage and monitoring
   containers for Rucio tests)
 
 [sextant]: https://github.com/openalto/sextant
@@ -25,7 +25,7 @@ Make sure you have the following required tools and software packages installed:
 
 - `docker`: <https://docs.docker.com/engine/install/>
 - `docker-compose`: <https://docs.docker.com/compose/install/>
-- `openswitch-switch`: <https://www.openvswitch.org/download/>
+- `openvswitch-switch`: <https://www.openvswitch.org/download/>
 
 > *NOTE*: `openvswitch` is not supported by Mac OSX and Windows. If you are
 > using a Mac or Windows machine, please install a Linux VM first.
@@ -72,7 +72,7 @@ Then you will enter the OpenDaylight shell:
 opendaylight-user@root>
 ```
 
-You can check all the features which has been already installed:
+You can check all the features which have been already installed:
 
 ``` sh
 opendaylight-user@root> feature:list -i
@@ -87,7 +87,7 @@ of the ALTO server:
 opendaylight-user@root> feature:install odl-alto-core odl-alto-manual-maps
 ```
 
-First, verify all the required features are installed successfully:
+First, verify that all the required features are installed successfully:
 
 ``` sh
 opendaylight-user@root> feature:list -i | grep odl-alto-
@@ -101,8 +101,8 @@ odl-alto-northbound                  │ 0.6.4            │          │ Start
 odl-alto-standard-northbound-route   │ 0.6.4            │          │ Started │ odl-alto-standard-northbound-route   │ OpenDaylight :: alto :: Standard Northbound Route
 ```
 
-Then you can log out the OpenDaylight shell, and run a simple test for default
-the ALTO [Information Resource Directory (IRD)](https://www.rfc-editor.org/rfc/rfc7285.html#section-9):
+Then, you can log out from the OpenDaylight shell and run a simple test to extract ALTO's default
+[Information Resource Directory (IRD)](https://www.rfc-editor.org/rfc/rfc7285.html#section-9):
 
 > *NOTE*: The default configured authorization is (username: `admin`, password:
 `admin`). It is provided by the Authentication, Authorization and Accounting
@@ -119,7 +119,7 @@ $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 
 }
 ```
 
-You can see the IRD is empty right now. Then let's add an [example default network map](../templates/alto_manual_networkmap_config.template):
+You can see that the IRD is empty right now. Let's add an [example default network map](../templates/alto_manual_networkmap_config.template):
 
 ``` sh
 $ curl -u admin:admin -X PUT -H "Content-Type: application/json" -d "$(cat ../templates/alto_manual_networkmap_config.template)" http://localhost:8181/restconf/config/alto-manual-maps:config-context/00000000-0000-0000-0000-000000000000/resource-network-map/default-networkmap
@@ -131,7 +131,7 @@ Set-Cookie: rememberMe=deleteMe; Path=/restconf; Max-Age=0; Expires=Tue, 08-Mar-
 Content-Length: 0
 ```
 
-The IRD will be automatically updated:
+Now the IRD is populated:
 
 ``` sh
 $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 -m json.tool
@@ -148,7 +148,7 @@ $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 
 }
 ```
 
-Now, the network map can be got via ALTO protocol:
+Now, the network map can be obtained via ALTO protocol:
 
 ``` sh
 {
@@ -182,10 +182,10 @@ Now, the network map can be got via ALTO protocol:
 }
 ```
 
-Then add an [example default cost map](../templates/alto_manual_costmap_config.template):
+Now add an [example default cost map](../templates/alto_manual_costmap_config.template):
 
 ``` sh
-$ curl -u admin:admin -X PUT -H "Content-Type: application/json" -d "$(cat ../templates/alto_manual_networkmap_config.template)" http://localhost:8181/restconf/config/alto-manual-maps:config-context/00000000-0000-0000-0000-000000000000/resource-cost-map/default-costmap
+$ curl -u admin:admin -X PUT -H "Content-Type: application/json" -d "$(cat ../templates/alto_manual_costmap_config.template)" http://localhost:8181/restconf/config/alto-manual-maps:config-context/00000000-0000-0000-0000-000000000000/resource-cost-map/default-costmap
 
 HTTP/1.1 201 Created
 Set-Cookie: JSESSIONID=1n6dris5mngy51hdis0cpebhp7;Path=/restconf
@@ -194,7 +194,7 @@ Set-Cookie: rememberMe=deleteMe; Path=/restconf; Max-Age=0; Expires=Tue, 08-Mar-
 Content-Length: 0
 ```
 
-The cost map will be added into the IRD:
+The cost was added into the IRD:
 
 ``` sh
 $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 -m json.tool
@@ -209,7 +209,7 @@ $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 
             ],
             "media-type": "application/alto-costmap+json",
             "uri": "http://172.26.0.2:8181/alto/costmap/default-costmap"
-        },
+        }
         "default-networkmap": {
             "media-type": "application/alto-networkmap+json",
             "uri": "http://172.26.0.2:8181/alto/networkmap/default-networkmap"
@@ -218,7 +218,7 @@ $ curl -u admin:admin -s http://localhost:8181/alto/simpleird/default | python3 
 }
 ```
 
-You can get cost map via ALTO protocol:
+You can get the cost map using the ALTO protocol:
 
 ``` sh
 {
@@ -259,7 +259,7 @@ You can get cost map via ALTO protocol:
 
 ### Dealing with Mininet
 
-Before you run the mininet, you should make sure you insert the `openvswitch`
+Before you run mininet, you should make sure you insert the `openvswitch`
 kernel module into your host OS kernel. You can run the following command to
 check it:
 
@@ -270,7 +270,7 @@ $ lsmod | grep openvswitch
 If nothing there, you should run the following command to insert the module:
 
 ``` sh
-$ modprob openvswitch
+$ modprobe openvswitch
 ```
 
 After that, you can start a standard mininet shell from the `g2-mininet`
@@ -285,11 +285,11 @@ root# mn
 mininet>
 ```
 
-## Developing Hackathon Project
+## Hackathon Demo
 
 ### Running Container for ALTO integrated Rucio
 
-Clone codebase for Rucio with ALTO integration:
+Clone the codebase for Rucio with ALTO's integration:
 
 ``` sh
 $ git clone -b ietf-hackathon-113 https://github.com/openalto/rucio.git
@@ -297,7 +297,7 @@ $ git clone https://github.com/openalto/alto.git
 ```
 
 > *NOTE*: [`ietf-hackathon-113`][ietf-hackathon-113] is a checkpoint of a
-> modified rucio version for demo purpose. The `feature-*` branches will
+> modified rucio version for demo purposes. The `feature-*` branches 
 > include changes to be merged into upstream rucio source code in the future.
 
 [ietf-hackathon-113]: https://github.com/openalto/rucio/tree/ietf-hackathon-113
@@ -305,12 +305,13 @@ $ git clone https://github.com/openalto/alto.git
 Build extended docker images for rucio development environment:
 
 ``` sh
+$ cd docker
 $ make build-rucio
 ```
 
 > *NOTE*: This command will build extended docker images for `rucio-dev` and
 > `xrootd`. More specifically, the extended docker images will install
-> `net-tools` and `iproute` packages on the original images. Because mininet
+> `net-tools` and `iproute` packages on the original images, because mininet
 > requires `ifconfig` and `ip` commands to operate network devices.
 
 Launch all docker containers:
