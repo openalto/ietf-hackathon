@@ -5,11 +5,11 @@ This is the central entry-point repository for the work done by the ALTO WG as p
 ### Where to Start
 
 - IETF Hackathon 113 project management dashboard: https://github.com/orgs/openalto/projects/1/views/1
-- Meeting Minutes: https://github.com/openalto/ietf-hackathon/wiki/Meeting-Minutes
+- Meeting Agendas: https://github.com/openalto/ietf-hackathon/wiki/Meeting-Agendas
 
 ### The ALTO Code Base Project
 
-Members of the ALTO WG, the IETF and the networking community are currently developing a base implementation of the ALTO standard. The implementation focuses on implementing a:
+Members of the IETF ALTO WG and the networking community are currently developing a base implementation of the ALTO standard. The implementation focuses on implementing a:
 
 - A base reference ALTO client
 - The ALTO server southbound interfaces to support the most widely used SDN controllers
