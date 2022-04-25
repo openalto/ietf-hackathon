@@ -1,14 +1,14 @@
 
 build-rucio:
 ifeq ($(shell docker images openalto/rucio-dev:latest -q),)
-	# docker build -t openalto/rucio-dev rucio-containers/dev/
+	docker build -t openalto/rucio-dev rucio-containers/dev/
 else
-	@echo "Image openalto/rucio-dev exists."
+	@echo "Image openalto/rucio-dev exists. You can run `make update-rucio` to rebuild the image."
 endif
 ifeq ($(shell docker images openalto/xrootd:latest -q),)
-	# docker build -t openalto/xrootd rucio-containers/xrootd/
+	docker build -t openalto/xrootd rucio-containers/xrootd/
 else
-	@echo "Image openalto/xrootd exists."
+	@echo "Image openalto/xrootd exists. You can run `make update-rucio` to rebuild the image."
 endif
 
 build-g2-mininet:
