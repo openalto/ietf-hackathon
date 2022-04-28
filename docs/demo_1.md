@@ -27,7 +27,7 @@ Docker directory contains multiple dokcer-compose reference files to build the d
 
 Both configurations build and mount different components of Rucio and ALTO on images. Thus, you need to clone those repositories in the **docker** directory. 
 
-| *Do not use sudo and make sure that the repos are present in the working directory (i.e. docker).*
+> *Do not use sudo, and please make sure that the requested repos are present in the working directory (i.e. docker).*
 
 ```
 git clone -b ietf-hackathon-113 https://github.com/openalto/rucio.git
@@ -72,7 +72,7 @@ Then you can set up the demo rucio datasets and replicas.
 ```sh
 containernet> rc tools/run_tests_docker.sh -ir
 ```
-| Notice: This may take a few minutes to return. 
+> Notice: This may take a few minutes to finish. 
 
 ### Debugging guide
 If you encountered errors in the logs output by the above command, you may refer to the Rucio documentation to check for the reason behind specific error codes. In particular "*destination RSE not reachable*" happens when the XRootD image is not built correctly (refer to makefile).
