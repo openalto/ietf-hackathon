@@ -1,4 +1,4 @@
-# Demo 1: Alto-Based Replica Sorting
+# Demo 1: ALTO-Based Replica Sorting
 ## Introduction
 
 As described in the [story](https://github.com/openalto/ietf-hackathon/new/documentation/docs/hackathon_comprehensive_story.md), at the hackathon 113, we aimed to augment Rucio reference data with real-time network information and investigate the possible boost in different performance metrics. 
@@ -22,10 +22,10 @@ Please clone the code base for *ietf_hackathon*.
 git clone https://github.com/openalto/ietf-hackathon
 cd ietf-hackathon/docker
 ``` 
-Docker directory contains multiple dokcer-compose reference files to build the demo environment. For this demo you either need [Alto and Rucio integrated](../docker/) or [Alto and Rucio Integrated with Rucio monitoring](hackathon_comprehensive_story.md) Dockerfiles. Although we only use s-flow monitoring for this demo, we strongly recommend using the latter as you will have access to full-extent monitoring to work on other demos later. 
+Docker directory contains multiple dokcer-compose reference files to build the demo environment. For this demo you either need [ALTO and Rucio integrated](../docker/) or [ALTO and Rucio Integrated with Rucio monitoring](hackathon_comprehensive_story.md) Dockerfiles. Although we only use s-flow monitoring for this demo, we strongly recommend using the latter as you will have access to full-extent monitoring to work on other demos later. 
 
 
-Both configurations build and mount different components of Rucio and Alto on images. Thus, you need to clone those repositories in the **docker** directory. 
+Both configurations build and mount different components of Rucio and ALTO on images. Thus, you need to clone those repositories in the **docker** directory. 
 
 | *Do not use sudo and make sure that the repos are present in the working directory (i.e. docker).*
 
@@ -178,8 +178,8 @@ Then you can go to your web browser to see the dashboard at
 
 [mininet-dashboard]: https://github.com/sflow-rt/mininet-dashboard
 
-As depicted above using Alto-based replication sorting in the given topology decreased the download time to a third.  
+As depicted above using ALTO-based replication sorting in the given topology decreased the download time to a third.  
 
 
 ## Contributions
-[Rucio replica sorter](https://github.com/rucio/rucio/blob/master/lib/rucio/core/replica_sorter.py) sorts available RSEs for a DiD download. But the sorting in the main branch is done only using static and imprecise measures (i.e. GeoIP data). In `alto-integration` branch we added [Alto based sorting](https://github.com/openalto/rucio/blob/605fbfd37495a874709133e59e23bfa7a884bbbf/lib/rucio/core/replica_sorter.py#L176). 
+[Rucio replica sorter](https://github.com/rucio/rucio/blob/master/lib/rucio/core/replica_sorter.py) sorts available RSEs for a DiD download. But the sorting in the main branch is done only using static and imprecise measures (i.e. GeoIP data). In `alto-integration` branch we added [ALTO based sorting](https://github.com/openalto/rucio/blob/605fbfd37495a874709133e59e23bfa7a884bbbf/lib/rucio/core/replica_sorter.py#L176). 
