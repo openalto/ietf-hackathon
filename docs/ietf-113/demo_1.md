@@ -1,13 +1,13 @@
 # Demo 1: Alto-based Replica Sorting
 ## Introduction
 
-As described in the [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/hackathon_comprehensive_story.md), at the hackathon 113, we aimed to augment Rucio reference data with real-time network information and investigate the possible boost in different performance metrics. 
+As described in the [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/ietf-113/hackathon_comprehensive_story.md), at the hackathon 113, we aimed to augment Rucio reference data with real-time network information and investigate the possible boost in different performance metrics. 
 
 The first step to achieving this integration is to provide the Rucio replica sorting with up-to-date network cost metrics queried dynamically from an ALTO server.
 
 In this document, we first illustrate the changes needed in the Rucio code and environment to utilize ALTO in replica sorting, and then we show the drastic effects of running the Rucio download command with this different sorting scheme. 
 
-To read more about the story or components of the system, please refer to [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/hackathon_comprehensive_story.md). 
+To read more about the story or components of the system, please refer to [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/ietf-113/hackathon_comprehensive_story.md). 
 
 
 > *NOTE*: Outputs of the commands are omitted in this document, for detailed output please refer to [the environment setup document](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/environment_setup.md).
@@ -22,7 +22,7 @@ Please clone the code base for *ietf_hackathon*.
 git clone https://github.com/openalto/ietf-hackathon
 cd ietf-hackathon/docker
 ``` 
-Docker directory contains multiple docker-compose reference files to build the demo environment. For this demo, you either need [ALTO and Rucio integrated](../docker/) or [ALTO and Rucio Integrated with Rucio monitoring](https://github.com/openalto/ietf-hackathon/blob/main/docker/docker-compose-with-rucio-monit.yml) Dockerfiles. Although we only use s-flow monitoring for this demo, we strongly recommend using the latter as you will have access to full-extent monitoring to work on other demos later. 
+Docker directory contains multiple docker-compose reference files to build the demo environment. For this demo, you either need [ALTO and Rucio integrated](https://github.com/openalto/ietf-hackathon/tree/main/docker) or [ALTO and Rucio Integrated with Rucio monitoring](https://github.com/openalto/ietf-hackathon/blob/main/docker/docker-compose-with-rucio-monit.yml) Dockerfiles. Although we only use s-flow monitoring for this demo, we strongly recommend using the latter as you will have access to full-extent monitoring to work on other demos later. 
 
 
 Both configurations build and mount different components of Rucio and ALTO on images. Thus, you need to clone those repositories in the **docker** directory. 
@@ -34,7 +34,7 @@ git clone -b ietf-hackathon-113 https://github.com/openalto/rucio.git
 git clone https://github.com/openalto/alto.git
 ```
 
-You should then build Rucio dev and XRootD images (for more information on what XRootD is please refer to [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/hackathon_comprehensive_story.md). These images are located in the `rucio-containers` directory. Provided makefile builds these images automatically. 
+You should then build Rucio dev and XRootD images (for more information on what XRootD is please refer to the [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/ietf-113/hackathon_comprehensive_story.md). These images are located in the `rucio-containers` directory. Provided makefile builds these images automatically. 
 ```
 make build-rucio
 ```
@@ -55,9 +55,9 @@ docker-compose -f docker-compose-with-rucio-monit.yml up -d
 1. If the *ssh* image fails to be built, the problem is probably with mounting ssh keys to the image. Make sure that you have cloned the *latest version* and have it placed in the working directory.
 2. If network volume conflict occurred: Please use docker-compose down to erase previously set network volumes. ```docker-compose down -v```
 
-For a starting point, we provided a basic topology [here](../utils/rucio_example.py), that you can bring up and test using the following command. 
+For a starting point, we provided a basic topology [here](https://github.com/openalto/ietf-hackathon/blob/main/utils/rucio_example.py), that you can bring up and test using the following command. 
 
-![topoplogy](assets/img/setup1.png)
+![topoplogy](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/assets/img/setup1.png)
 
 ```
 docker-compose -f docker-compose-with-rucio-monit.yml exec mininet python3 /utils/rucio_example.py
