@@ -1,16 +1,16 @@
 # Hackathon comprehensive story 
 
-ATLAS [[2]](#2) experiment is one of the four major scientific experiments at the Large Hadron Collider (LHC) [[3]](#3) at CERN [[4]](#4). Atlas generates more than one petabyte of data every day [[5]](#5), and has  unprecedented heterogenous computing and storage needs, because in addition to massive volume, **data generation, storage, access, and processing locations are divergent.**
+ATLAS [[2]](#2) experiment is one of the four major scientific experiments at the Large Hadron Collider (LHC) [[3]](#3) at CERN [[4]](#4). Atlas generates more than one petabyte of data every day [[5]](#5) and has  unprecedented heterogeneous computing and storage needs, because, in addition to massive volume, **data generation, storage, access, and processing locations are divergent.**
 
-Rucio is built on top of Atlas storage systems to **scalably and efficiently manage the replication and archiving of the created data and administer accesses to the data**. "**One of the guiding principles of Rucio is data flow autonomy and automation**": As a result, Rucio provides a unified interface for accessing and controlling the underlying diversified networking and storage services (such as XRootD and S3). Scientists and admins then manage data replication and access with Rucio integrated modules, **without dealing with underlying complexitites**.   
+Rucio is built on top of Atlas storage systems to **scalably and efficiently manage the replication and archiving of the created data and administer access to the data**. "**One of the guiding principles of Rucio is data flow autonomy and automation**": As a result, Rucio provides a unified interface for accessing and controlling the underlying diversified networking and storage services (such as XRootD and S3). Scientists and admins then manage data replication and access with Rucio integrated modules, **without dealing with underlying complexities**.   
 
-To optimize metrics (cost, speed, etc.) **Rucio collects various information about the network and storage devices** that guide _data 1st) identifier transfers between sites (RSEs) and 2nd) source selections before downloads_ [[8]](#8). Most important collected measures are distances between RSEs (Rucio Storage Elements), **according to the aggregated download throughput between RSEs or geographical location databases** [[1]](#1). However, such metrics are (static and non-informative) as they might get stale and do not reflect cost parameters that Alto offers. 
+To optimize metrics (cost, speed, etc.) **Rucio collects various information about the network and storage devices** that guide _data 1st) identifier transfers between sites (RSEs) and 2nd) source selections before downloads_ [[8]](#8). The most important collected measures are distances between RSEs (Rucio Storage Elements), **according to the aggregated download throughput between RSEs or geographical location databases** [[1]](#1). However, such metrics are (static and non-informative) as they might get stale and do not reflect the cost parameters that Alto offers. 
 
-ALTO (Application-Layer Traffic Optimization) framework collects network information and exposes it to applications to steer traffi: **So we believe that ALTO integration in the Rucio environment, can improve transfer metrics.** ALTO is currently used in multiple large-scale systems such as ...
+ALTO (Application-Layer Traffic Optimization) framework collects network information and exposes it to applications to steer traffic: **So we believe that ALTO integration in the Rucio environment, can improve transfer metrics.** ALTO is currently used in multiple large-scale systems such as ...
 
-At IETF 113 Hackathon event, ALTO is used to provide Rucio's replication sorting and transfer scheduling parts with more accurate and up-t-date information about the network state (distances and available bandwidth). [Evaluation results](#Evaluations) showed that Alto-based replica sorting decreases replica transfer times by up to 66% (depending on the network structure and the bottlenecks). 
+At IETF 113 Hackathon event, ALTO is used to provide Rucio's replication sorting and transfer scheduling parts with more accurate and up-t-date information about the network state (distances and available bandwidth). [Evaluation Results](#Evaluations) showed that Alto-based replica sorting decreases replica transfer times by up to 66% (depending on the network structure and the bottlenecks). 
 
-In this document, we first describe the components of the devised system and then present the experiments setup and evaluation results. 
+In this document, we first describe the components of the devised system and then present the experiment setup and evaluation results. 
 
 ## Infrastructure and the Transfer services
 Rucio manages large volume data transfers of the ATLAS experiment. ATLAS infrastructure comprises a wide variety of storage and network systems. In this section, we briefly introduce these systems. Then provide a detailed description of our development environment networking and storage components.  
@@ -22,25 +22,25 @@ ATLAS comprises a wide variety of storage systems, such as XRootD, EOS, and dCac
 Rucio development environment uses XRootD storage instances [[12]](#12). Although our contributions to Rucio are not dependent on a specific storage system on the specific, we adapted the same containers to maximize environment compatibility and to comply with Rucio's development guidelines.
 
 #### XRootD 
-XRootD is a highly-configurable, scalable and high performance data server used by sites in OSG. Rucio interfaces with XRootD through xrdfs command [[15]](#15) (see the regarding implementation on [[14]](#14)). Scalla paper [[13]](#13) provides a architectural reference for the components of XRootD architecture and its scalable cluster management. You can also find reference on how XRootD is used on OSG experiments including ATLAS on [[17]](#17).
+XRootD is a highly configurable, scalable, and high-performance data server used by sites in OSG. Rucio interfaces with XRootD through xrdfs command [[15]](#15) (see the regarding implementation on [[14]](#14)). The Scala paper [[13]](#13) provides an architectural reference for the components of XRootD architecture and its scalable cluster management. You can also find references on how XRootD is used on OSG experiments including ATLAS on [[17]](#17).
 
 #### FTS 
 
-In high energy physics experiments, TPS (Third party copy) over HTTP is used to overcome GridFTP limitations and provides Tbps rate data transfer between sites by 2027 [[18]](#18). FTS ([[19]](#19) and [[20]](#20)) is the TPS solution of LHC that distributes data over LHC computation grid (WLCG). Rucio uses FTS to submit bulk transfer requests between sites [[1]](#1). Rucio development environment includes FTS image.  
+In high-energy physics experiments, TPS (Third-party copy) over HTTP is used to overcome GridFTP limitations and provides Tbps rate data transfer between sites by 2027 [[18]](#18). FTS ([[19]](#19) and [[20]](#20)) is the TPS solution of LHC that distributes data over LHC computation grid (WLCG). Rucio uses FTS to submit bulk transfer requests between sites [[1]](#1). The Rucio development environment includes an FTS image.  
 
 ### Networking
 
 #### Research Networks
-LHC utilizes multiple National Research and Education networks (including ESnet, and Geant) to provide connectivity between data collection and processing sites. This network scales to an aggregated link capacity of 2Tbps and has specific peering points to commercial cloud providers for low-latency data accesses [[1]](#1). Although Rucio manages rule-based data transfers on these networks, it does not have access to the real-time network metrics for efficient or cost-optimized transfer schdeduling. Our ultimate goal in this study is to forify Rucio network information base and enable optimized transfer scheduling.
+LHC utilizes multiple National Research and Education networks (including ESnet, and Geant) to provide connectivity between data collection and processing sites. This network scales to an aggregated link capacity of 2Tbps and has specific peering points to commercial cloud providers for low-latency data accesses [[1]](#1). Although Rucio manages rule-based data transfers on these networks, it does not have access to the real-time network metrics for efficient or cost-optimized transfer scheduling. Our ultimate goal in this study is to fortify the Rucio network information base and enable optimized transfer scheduling.
 
 #### Mininet 
-Mininet simulates a realistic virtual network with desired metrics on VMs. We use Mininet as the underlying network between XRD servers and endhosts (as depicted in ... ) to realisticly simulate link capacities and bottleneck strcutures in this study. Containernet (a Mininet extension) is used to enable docker containers as Mininet end hosts. We also used G2-mininet to simplify setting up mininet topologies. G2 is a flow optimization framework based gradient that formulates bottleneck structures in a network. For a detailed description on the environment setup please refer to [[23]](#23).
+Mininet simulates a realistic virtual network with desired metrics on VMs. We use Mininet as the underlying network between XRD servers and end-hosts (as depicted in ... ) to realistically simulate link capacities and bottleneck structures in this study. Containernet (a Mininet extension) is used to enable docker containers as Mininet end hosts. We also used G2-mininet to simplify setting up mininet topologies. G2 is a flow optimization framework-based gradient that formulates bottleneck structures in a network. For a detailed description of the environment setup please refer to [[23]](#23).
 
 ### Rucio 
 
 
 #### Data Identifiers
-Rucio namespace comprises DIDs (data identifiers) with different granularities. DIDs can either be files containing immutable experiment data, a collection of files (datasets), or a set of datasets (containers). Each DID consists of a unique string tuple divided by a colon indicating a scope (experimental data or simulation data for example) and a name. Each DID will be replicated on multiple (possibly zero) locations on the ATLAS storage systems. Replication of the data inside Rucio obeys the replication rules. More details on how Rucio manages namespace, access lists and accounting is out of scope for this document, but reader can refer to the Rucio's documentation, reference paper, or source code.
+Rucio namespace comprises DIDs (data identifiers) with different granularities. DIDs can either be files containing immutable experiment data, a collection of files (datasets), or a set of datasets (containers). Each DID consists of a unique string tuple divided by a colon indicating a scope (experimental data or simulation data for example) and a name. Each DID will be replicated on multiple (possibly zero) locations on the ATLAS storage systems. Replication of the data inside Rucio obeys the replication rules. More details on how Rucio manages namespace, access lists, and accounting are out of scope for this document, but the reader can refer to the Rucio's documentation, reference paper, or source code.
 
 #### Resource Storage Elements
 RSE (Resource Storage Element) is an abstraction for the minimal level of the addressable storage system in Rucio's underlying storage and networking systems [[1]](#1). Each DID will eventually be replicated on some RSEs. 
@@ -55,9 +55,9 @@ Rucio collects system state information to optimize DID transfers. Rucio also us
 Rucio formally expresses the requirements for the experiments' data replications with the complete language of the replication rules ([[1]](#1)-[[23]](#23)). A replication rule consists of four parts, denoting a set of DIDs, their acceptable destination RSEs, the number of desired replicas, and an availability deadline (after which data would no longer be required.) 
 
 #### Replica sorting
-Scientists can download data identifiers manifestation on a specific RSE from end hosts. Replica sorter returns a sorted list of PFNs on different RSEs based on different distance measures between the scientist location and the destination RSEs. Scientists then download the DID from the best candidate PFN based on replica sorter recommendations. [[24]](#24) documents `rucio list-file-replicas` specs. OpenAlto IETF113 environment setup document shows replica sorter output in detail [[25]](#25). Native replica sorter implementation includes several sorting functions based on static IP measures, most importantly GeoIP city distance [[26]](#26). 
+Scientists can download data identifiers manifestation on a specific RSE from end hosts. Replica sorter returns a sorted list of PFNs on different RSEs based on different distance measures between the scientist's location and the destination RSEs. Scientists then download the DID from the best candidate PFN based on replica sorter recommendations. [[24]](#24) documents `rucio list-file-replicas` specs. OpenAlto IETF113 environment setup document shows replica sorter output in detail [[25]](#25). Native replica sorter implementation includes several sorting functions based on static IP measures, most importantly GeoIP city distance [[26]](#26). 
 
-However, GeoIP distances are inherently unreliable due to low accuracy (only in Switzerland 25% of the entries are incorrectly resolved [[27]](#27)). We aim to augment distance metrics accuracy using ALTO provided information to enable more efficinet downloads.
+However, GeoIP distances are inherently unreliable due to low accuracy (only in Switzerland 25% of the entries are incorrectly resolved [[27]](#27)). We aim to augment distance metrics accuracy using ALTO-provided information to enable more efficient downloads.
 
 ##### Transfer Scheduling
 
@@ -68,7 +68,7 @@ Application Layer Traffic Optimization (ALTO) is a protocol that expose network 
 Alto client [[28]](#28) is a python library that enables access to the ALTO server and fetches cost maps and network maps. 
 
 ### Topology
-Sextant can extract information from general topologies, however in IETF hackathon 113 a simple topology is used to demonstrate ALTO replication sorting effectiveness.
+Sextant can extract information from general topologies, however, in IETF hackathon 113, a simple topology is used to demonstrate ALTO replication sorting effectiveness.
 
 ```
               Rucio
@@ -88,14 +88,14 @@ Sextant can extract information from general topologies, however in IETF hackath
 G2 (Gradient Graph) ([[29]](#29), [[30]](#30), [[31]](#31)) is a framework for network optimization through bottleneck structures. ALTO and G2 complete each other as information extraction and information based optimization frameworks. G2 mininet is a module that simplifies mininet network configurations and executions with **topologies**, **network schemas** and **flow configurations** [[32]](#32) and has lots of [interesting topologies](https://github.com/reservoirlabs/g2-mininet/tree/master/experiments) (like [Google B4](https://github.com/reservoirlabs/g2-mininet/blob/master/experiments/g2_network01/input/g2.conf)) preimplemented. More information on how G2 mininet can be integrated in the Rucio+ALTO demo environment can be found on [[25]](#25) [here](https://github.com/openalto/ietf-hackathon/blob/main/docs/environment_setup.md).
 
 ## Demos
-Over the course of IETF hackathon 113 three demos have been implemented to demonstrate the effects of ALTO and the provided information on Rucio replica download. These demos are respectively designed to: 
+Throughout IETF hackathon 113, three demos have been implemented to demonstrate the effects of ALTO and the provided information on the Rucio replica download. These demos are respectively designed to: 
 > 1- Add alto cost maps to sort replicas based on **dynamic** network information provided by the ALTO server. [](link to specific document)
 
-> 2- Given a list of flows between RSEs and end terminals (link to specific document), transfer rates are estimated using network utility fuctions. [](link to specific document)
+> 2- Given a list of flows between RSEs and end terminals (link to specific document), transfer rates are estimated using network utility functions. [](link to specific document)
 
-> 3- Iteratively search download options for different DIDs and a set of terminals to find a viable solution with respect to minimum acceptable download rates (transfer deadlines). [](link to specific document)
+> 3- Iteratively search download options for different DIDs and a set of terminals to find a viable solution concerning minimum acceptable download rates (transfer deadlines). [](link to specific document)
 
-## Conclusoin 
+## Conclusion 
 During IETF hackathon 113, use cases of **dynamic** network information (collected and reflected via ALTO server) were demonstrated.
 
 
