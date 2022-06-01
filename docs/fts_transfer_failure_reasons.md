@@ -22,6 +22,7 @@ ctx.cdmiUpdateFileStateToFailed function change the state of a file to failed. T
 
 Besides files, other tasks based contexts are also changeable to the Failed state, **they are not used in the optimization algorithm though.** Each job type inherits ctx.updateState and calls it with a proper failure reason. 
 
+A list of Failed files and their respective complete logs are available [here](https://fts3-pilot.cern.ch:8449/fts3/ftsmon/#/transfers?state=FAILED&vo=escape&source_se=davs:%2F%2Fdclxwp2dlds1.gsi.de&dest_se=davs:%2F%2Fccdcalitest10.in2p3.fr&reason=SOURCE%20%5B113%5D%20Result%20Domain%20name%20resolution%20failed%20after%201%20attempts&time_window=1).
 ## Conclusion 
 
 
