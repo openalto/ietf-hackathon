@@ -2,7 +2,7 @@
 
 In FTS, job and file state machines are depicted [here](https://fts3-docs.web.cern.ch/fts3-docs/docs/state_machine.html). A single file is failed if *"FAILED Transfer failed, and the retries have been exhausted"*. 
 
-Upadtes in transmission rates (where optimization as represented in the docs with optimization algorithm [here](https://fts3-docs.web.cern.ch/fts3-docs/docs/optimizer/optimizer.html) mainly is done in [OptimizerConnections](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/server/services/optimizer/OptimizerConnections.cpp#L160) file. The optimizeConnectionsForPair function fetches the success rate form db. All db operations are handled using MySQL. The function which is called to fetch the success rate is [getSuccessRateForPair](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/db/mysql/OptimizerDataSource.cpp#L285). 
+Upadtes in transmission rates (with optimization as represented in the docs with the optimization algorithm [here](https://fts3-docs.web.cern.ch/fts3-docs/docs/optimizer/optimizer.html)) mainly is done in [OptimizerConnections](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/server/services/optimizer/OptimizerConnections.cpp#L160) file. The optimizeConnectionsForPair function fetches the success rate form db. All db operations are handled using MySQL. The function which is called to fetch the success rate is [getSuccessRateForPair](https://gitlab.cern.ch/fts/fts3/-/blob/develop/src/db/mysql/OptimizerDataSource.cpp#L285). 
 
 getSuccessRateForPair function aggregates all the files which belongs to a single transmission and counts the number of failed and finished files accordingly. 
 
