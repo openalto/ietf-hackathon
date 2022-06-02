@@ -6,7 +6,7 @@ Upadtes in transmission rates (with optimization as represented in the docs with
 
 getSuccessRateForPair function aggregates all the files which belongs to a single transmission and counts the number of failed and finished files accordingly. 
 
-States of the jobs and transfers/files are updated via the QoS-daemon. In this daemon, contexts are responsible for tracking the states of different jobs. While tasks are updating the states for different states inside contexts. Detailed documentation of the QoS-daemon is [here](https://fts3-docs.web.cern.ch/fts3-docs/docs/qos-service/qos-service.html). 
+States of the jobs and transfers/files are updated by the QoS-daemon or the transfer service. In the QoS daemon, contexts are responsible for tracking the states of different jobs. While tasks are updating the states for different states inside contexts. Detailed documentation of the QoS-daemon is [here](https://fts3-docs.web.cern.ch/fts3-docs/docs/qos-service/qos-service.html). 
 
 `Different tasks are documented in the above link.`
 
