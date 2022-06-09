@@ -1,4 +1,4 @@
-# Demo 1: Alto-based Replica Sorting
+# Demo 1: ALTO-based Replica Sorting
 ## Introduction
 
 As described in the [story](https://github.com/openalto/ietf-hackathon/blob/documentation/docs/ietf-113/hackathon_comprehensive_story.md), at the hackathon 113, we aimed to augment Rucio reference data with real-time network information and investigate the possible boost in different performance metrics. 
@@ -178,7 +178,7 @@ Then you can go to your web browser to see the dashboard at
 
 [mininet-dashboard]: https://github.com/sflow-rt/mininet-dashboard
 
-As depicted above using Alto-based replication sorting in the given topology decreased the download time to a third.  
+As depicted above using ALTO-based replication sorting in the given topology decreased the download time to a third.  
 
 
 ## Contributions
