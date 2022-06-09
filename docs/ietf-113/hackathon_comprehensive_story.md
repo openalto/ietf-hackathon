@@ -4,11 +4,11 @@ ATLAS [[2]](#2) experiment is one of the four major scientific experiments at th
 
 Rucio is built on top of Atlas storage systems to scalably and efficiently manage the replication and archiving of the created data and administer access to the data. One of the guiding principles of Rucio is data flow autonomy and automation: As a result, Rucio provides a unified interface for accessing and controlling the underlying diversified networking and storage services (such as XRootD and S3). Scientists and admins then manage data replication and access with Rucio integrated modules, without dealing with underlying complexities.   
 
-To optimize metrics (cost, speed, etc.) Rucio collects various information about the network and storage devices that guide _data 1st) identifier transfers between sites (RSEs) and 2nd) source selections before downloads_ [[8]](#8). The most important collected measures are distances between RSEs (Rucio Storage Elements), according to the aggregated download throughput between RSEs or geographical location databases [[1]](#1). However, such metrics are (static and non-informative) as they might get stale and do not reflect the cost parameters that Alto offers. 
+To optimize metrics (cost, speed, etc.) Rucio collects various information about the network and storage devices that guide _data 1st) identifier transfers between sites (RSEs) and 2nd) source selections before downloads_ [[8]](#8). The most important collected measures are distances between RSEs (Rucio Storage Elements), according to the aggregated download throughput between RSEs or geographical location databases [[1]](#1). However, such metrics are (static and non-informative) as they might get stale and do not reflect the cost parameters that ALTO offers. 
 
 ALTO (Application-Layer Traffic Optimization) framework collects network information and exposes it to applications to steer traffic: So we believe that ALTO integration in the Rucio environment, can improve transfer metrics. 
 
-At IETF 113 Hackathon event, ALTO was used to provide Rucio's replication sorting and transfer scheduling parts with more accurate and up-to-date information about the network state (distances and available bandwidth). [Evaluation Results](#Evaluations) showed that Alto-based replica sorting decreases replica transfer times by up to 66% (depending on the network structure and the bottlenecks). 
+At IETF 113 Hackathon event, ALTO was used to provide Rucio's replication sorting and transfer scheduling parts with more accurate and up-to-date information about the network state (distances and available bandwidth). [Evaluation Results](#Evaluations) showed that ALTO-based replica sorting decreases replica transfer times by up to 66% (depending on the network structure and the bottlenecks). 
 
 In this document, we first describe the components of the devised system and then present the experiment setup and evaluation results. 
 
@@ -55,7 +55,7 @@ Rucio collects system state information to optimize DID transfers. Rucio also us
 Rucio formally expresses the requirements for the experiments' data replications with the complete language of the replication rules ([[1]](#1)-[[23]](#23)). A replication rule consists of four parts, denoting a set of DIDs, their acceptable destination RSEs, the number of desired replicas, and an availability deadline (after which data would no longer be required.) 
 
 #### Replica sorting
-Scientists can download data identifiers manifestation on a specific RSE from end hosts. Replica sorter returns a sorted list of PFNs on different RSEs based on different distance measures between the scientist's location and the destination RSEs. Scientists then download the DID from the best candidate PFN based on replica sorter recommendations. [[24]](#24) documents `rucio list-file-replicas` specs. OpenAlto IETF113 environment setup document shows replica sorter output in detail [[25]](#25). Native replica sorter implementation includes several sorting functions based on static IP measures, most importantly GeoIP city distance [[26]](#26). 
+Scientists can download data identifiers manifestation on a specific RSE from end hosts. Replica sorter returns a sorted list of PFNs on different RSEs based on different distance measures between the scientist's location and the destination RSEs. Scientists then download the DID from the best candidate PFN based on replica sorter recommendations. [[24]](#24) documents `rucio list-file-replicas` specs. OpenALTO IETF113 environment setup document shows replica sorter output in detail [[25]](#25). Native replica sorter implementation includes several sorting functions based on static IP measures, most importantly GeoIP city distance [[26]](#26). 
 
 However, GeoIP distances are inherently unreliable due to low accuracy (only in Switzerland 25% of the entries are incorrectly resolved [[27]](#27)). We aim to augment distance metrics accuracy using ALTO-provided information to enable more efficient downloads.
 
@@ -65,7 +65,7 @@ However, GeoIP distances are inherently unreliable due to low accuracy (only in 
 Application Layer Traffic Optimization (ALTO) is a protocol that expose network information to ISPs to steer traffic efficiently. ALTO uses **Cost Maps** ([sample](https://github.com/openalto/pyalto-client/blob/main/examples/cm.json)) and **Network Maps** ([sample](https://github.com/openalto/pyalto-client/blob/main/examples/nm.json)) abstractions to report requested measures to the clients [[9]](9). Sextant is an open source implementation of ALTO that works on [Opendaylight](https://www.opendaylight.org/).
 
 ### ALTO Client 
-Alto client [[28]](#28) is a python library that enables access to the ALTO server and fetches cost maps and network maps. 
+ALTO client [[28]](#28) is a python library that enables access to the ALTO server and fetches cost maps and network maps. 
 
 ### Topology
 Sextant can extract information from general topologies, however, in IETF hackathon 113, a simple topology is used to demonstrate ALTO replication sorting effectiveness.
@@ -89,7 +89,7 @@ G2 (Gradient Graph) ([[29]](#29), [[30]](#30), [[31]](#31)) is a framework for n
 
 ## Demos
 Throughout IETF hackathon 113, three demos have been implemented to demonstrate the effects of ALTO and the provided information on the Rucio replica download. These demos are respectively designed to: 
-> 1- Add alto cost maps to sort replicas based on **dynamic** network information provided by the ALTO server. [](link to specific document)
+> 1- Add ALTO cost maps to sort replicas based on **dynamic** network information provided by the ALTO server. [](link to specific document)
 
 > 2- Given a list of flows between RSEs and end terminals (link to specific document), transfer rates are estimated using network utility functions. [](link to specific document)
 
