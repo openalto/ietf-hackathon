@@ -12,7 +12,7 @@ from mininet.link import TCLink
 from mininet.log import info, setLogLevel
 setLogLevel('info')
 
-setattr(Mininet, 'start', wrapper(Mininet.__dict__['start']))
+# setattr(Mininet, 'start', wrapper(Mininet.__dict__['start']))
 
 """
 Create the following topology:
@@ -50,12 +50,12 @@ info('*** Creating links\n')
 net.addLink(xrd1, s1)
 net.addLink(xrd2, s2)
 net.addLink(rucio, s3)
-net.addLink(s1, s3, cls=TCLink, delay='25ms', bw=1)
-net.addLink(s2, s3, cls=TCLink, delay='25ms', bw=1)
+net.addLink(s1, s3, cls=TCLink, delay='5ms', bw=1)
+net.addLink(s2, s3, cls=TCLink, delay='5ms', bw=1)
 net.addLink(xrd3, s4)
-net.addLink(s3, s4, cls=TCLink, delay='25ms', bw=5)
+net.addLink(s3, s4, cls=TCLink, delay='5ms', bw=1)
 net.addLink(xrd4, s5)
-net.addLink(s4, s5, cls=TCLink, delay='50ms', bw=2)
+net.addLink(s4, s5, cls=TCLink, delay='5ms', bw=1)
 info('*** Starting network\n')
 net.start()
 
