@@ -1,6 +1,8 @@
 Alias=rucio/fts
 SiteName=DOCKER
 
+Infosys=false
+
 AuthorizedVO=*
 
 DbType=mysql

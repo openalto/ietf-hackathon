@@ -5,6 +5,12 @@ FTS_NODE=rucio
 FTS_HOST=fts
 FTSDB_NODE=ftsdb
 
+init_fts () {
+    docker-compose -f $COMPOSE_FILE exec $FTS_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
+    docker-compose -f $COMPOSE_FILE exec $FTS_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
+    docker-compose -f $COMPOSE_FILE exec $FTS_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
+}
+
 gen_test_file () {
     local target_se=$1
     local filename=$2
@@ -55,5 +61,24 @@ submit_batch_transfer () {
 dump_optimizer_hist () {
     local sql_stmt='select * from t_optimizer_evolution where datetime > '"'"$1"'"
     docker-compose -f $COMPOSE_FILE exec $FTSDB_NODE bash -c 'echo "'"$sql_stmt"'" | mysql -u fts --password=fts fts'
+}
+
+config_fts_link () {
+    set -f
+    local source_se=$1
+    local dest_se=$2
+    local min_active=$3
+    local max_active=$4
+    local msg='{"symbolicname":"'$source_se'-'$dest_se'","source":"'$source_se'","destination":"'$dest_se'","min_active":'$min_active',"max_active":'$max_active'}'
+    docker-compose -f $COMPOSE_FILE exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/config/links
+    set +f
+}
+
+config_optimizer () {
+    local source_se=$1
+    local dest_se=$2
+    local active=$3
+    local msg='{"source_se":"'$source_se'","dest_se":"'$dest_se'","active":'$active'}'
+    docker-compose -f $COMPOSE_FILE exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/optimizer/current
 }
 
