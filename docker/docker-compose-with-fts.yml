@@ -91,6 +91,7 @@ services:
     volumes:
       - ./rucio/etc/certs/hostcert_xrd1.pem:/tmp/xrdcert.pem:Z
       - ./rucio/etc/certs/hostcert_xrd1.key.pem:/tmp/xrdkey.pem:Z
+      - ./xrootd-client.conf:/etc/xrootd/client.conf:Z
     cap_add:
       - NET_ADMIN
   xrd2:
@@ -111,6 +112,7 @@ services:
     volumes:
       - ./rucio/etc/certs/hostcert_xrd2.pem:/tmp/xrdcert.pem:Z
       - ./rucio/etc/certs/hostcert_xrd2.key.pem:/tmp/xrdkey.pem:Z
+      - ./xrootd-client.conf:/etc/xrootd/client.conf:Z
     cap_add:
       - NET_ADMIN
   xrd3:
@@ -131,6 +133,7 @@ services:
     volumes:
       - ./rucio/etc/certs/hostcert_xrd3.pem:/tmp/xrdcert.pem:Z
       - ./rucio/etc/certs/hostcert_xrd3.key.pem:/tmp/xrdkey.pem:Z
+      - ./xrootd-client.conf:/etc/xrootd/client.conf:Z
     cap_add:
       - NET_ADMIN
   activemq:
