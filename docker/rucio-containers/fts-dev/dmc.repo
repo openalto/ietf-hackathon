@@ -1,0 +1,6 @@
+[dmc-builds]
+name=DMC Continuous Build Repository
+baseurl=http://dmc-repo.web.cern.ch/dmc-repo/testing/el$releasever/$basearch
+gpgcheck=0
+enabled=1
+protect=1
