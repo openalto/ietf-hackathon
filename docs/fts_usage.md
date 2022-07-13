@@ -1,5 +1,7 @@
 # FTS Test
 
+Check [`environment_setup.md`](environment_setup.md) for prerequisite.
+
 ## Docker Environment Setup
 
 ```
@@ -25,6 +27,12 @@ $ config_optimizer root://xrd1 root://xrd2 8    # preconfigure active of xrd1 ->
 $ config_optimizer root://xrd1 root://xrd3 2    # preconfigure active of xrd1 -> xrd3 to 2
 $ submit_batch_transfer xrd1 xrd3 48 1 testfile
 $ submit_batch_transfer xrd1 xrd2 48 1 testfile
-$ dump_optimizer_hist $(date --frc-3339=date)
+$ dump_optimizer_hist $(date --rfc-3339=date)
 ```
+
+## Known Issues
+
+When too many concurrent fts-url-copy processes are running, there is high
+probability getting the "Operation expired" error from XrootD. (See details in
+<https://github.com/openalto/ietf-hackathon/issues/53>)
 
