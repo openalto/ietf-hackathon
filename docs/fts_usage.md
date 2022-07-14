@@ -36,3 +36,30 @@ When too many concurrent fts-url-copy processes are running, there is high
 probability getting the "Operation expired" error from XrootD. (See details in
 <https://github.com/openalto/ietf-hackathon/issues/53>)
 
+## Build Your Own FTS
+
+```
+$ docker build -t fts-dev rucio-container/fts-dev
+$ docker run -ti --rm -v <PATH_TO_FTS_REPO>:/fts3 fts-dev bash
+[root@22fa4d38704e /]# cd /fts3
+[root@22fa4d38704e /]# mkdir -p build
+[root@22fa4d38704e /]# cd build
+[root@22fa4d38704e /]# cmake /fts3 -DALLBUILD=ON
+[root@22fa4d38704e /]# make
+```
+
+## Setup Environment using Your Own FTS
+
+Modify the docker compose YAML file and mount the following binary files to the
+fts container:
+
+```
+  fts:
+    image: docker.io/rucio/fts
+    network_mode: "service:rucio"
+    volumes:
+      - ./fts3config:/etc/fts3/fts3config:Z
+      - <path-to-your-fts-repo>/build/src/server/libfts_server_lib.so.3.11.3:/usr/lib64/libfts_server_lib.so:Z
+      - <path-to-your-fts-repo>/build/src/server/fts_server:/usr/sbin/fts_server:Z
+```
+
