@@ -1,15 +1,13 @@
-name: test1
+name: test2
 static: fts
 dynamic:
   hosts:
     - name: "rucio"
       type: "rucio"
       ip: 10.0.0.250
-      # 
     - name: "xrd1"
       type: "xrd"
       ip: 10.0.0.251
-      # container_name: test1-sre1
     - name: "xrd2"
       type: "xrd"
       ip: 10.0.0.252
@@ -30,4 +28,3 @@ dynamic:
     - endpoints: ["s3", "s4"]
       latency: 5
       bandwidth: 10
-    # test1-s1
