@@ -1,0 +1,26 @@
+Alias=rucio/fts
+SiteName=DOCKER
+
+Infosys=false
+
+AuthorizedVO=*
+
+DbType=mysql
+DbUserName=fts
+DbPassword=fts
+DbConnectString=ftsdb/fts
+
+LogLevel=DEBUG
+
+MinRequiredFreeRAM = 100
+# MaxUrlCopyProcesses = 4
+
+StagingBulkSize = 200
+StagingWaitingFactor = 20
+
+OptimizerInterval = 20
+
+OptimizerEMAAlpha = 0.9
+
+[roles]
+Public = all:transfer;all:config;all:datamanagement
