@@ -1,0 +1,30 @@
+name: test2
+static: fts
+dynamic:
+  hosts:
+    - name: "rucio"
+      type: "rucio"
+      ip: 10.0.0.250
+    - name: "xrd1"
+      type: "xrd"
+      ip: 10.0.0.251
+    - name: "xrd2"
+      type: "xrd"
+      ip: 10.0.0.252
+    - name: "xrd3"
+      type: xrd
+      ip: 10.0.0.253
+  links:
+    - endpoints: ["xrd1", "s1"]
+    - endpoints: ["xrd2", "s2"]
+    - endpoints: ["xrd3", "s4"]
+    - endpoints: ["rucio", "s3"]
+    - endpoints: ["s1", "s3"]
+      latency: 5 # ms
+      bandwidth: 10 # Mbps
+    - endpoints: ["s2", "s3"]
+      latency: 5 
+      bandwidth: 10
+    - endpoints: ["s3", "s4"]
+      latency: 5
+      bandwidth: 10
