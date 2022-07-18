@@ -17,6 +17,9 @@ RUN \
     && unzip odl-alto-patch.zip \
     && odl-alto-patch/install_patch.sh /opt/opendaylight \
 
+# Install restful plugin \
+    && sed -i '/featuresBoot/s/$/, odl-openflowplugin-flow-services-rest, odl-l2switch-switch-rest/' /opt/opendaylight/etc/org.apache.karaf.features.cfg \
+
 # Cleanup packages
     && apt-get clean \
     && rm karaf-$ODL_VERSION.tar.gz odl-alto-patch.zip \
