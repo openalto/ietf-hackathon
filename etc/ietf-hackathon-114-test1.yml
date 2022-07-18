@@ -1,0 +1,45 @@
+name: test1
+static:
+  - fts
+dynamic:
+  domains:
+    - name: net1
+      controller:
+        name: odl1
+      hosts:
+        - name: "rucio"
+          type: "rucio"
+          ip: 10.0.0.250
+          #
+        - name: "xrd1"
+          type: "xrd"
+          ip: 10.0.0.251
+      links:
+        - endpoints: ["rucio", "s1"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["s1", "s2"]
+        - endpoints: ["xrd1", "s2"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+    - name: net2
+      controller:
+        name: odl2
+      hosts:
+        - name: "xrd2"
+          type: "xrd"
+          ip: 10.0.0.252
+        - name: "xrd3"
+          type: "xrd"
+          ip: 10.0.0.253
+      links:
+        - endpoints: ["xrd2", "s3"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["s3", "s4"]
+        - endpoints: ["xrd3", "s4"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+  interdomain:
+    - endpoints: ["s1", "s3"]
+    - endpoints: ["s2", "s4"]
