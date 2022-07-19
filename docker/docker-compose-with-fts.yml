@@ -52,6 +52,19 @@ services:
       - RDBMS=postgres14
     cap_add:
       - NET_ADMIN
+  odl1:
+    image: openalto/odl:0.8.4
+    build: odl/
+    container_name: odl1
+    entrypoint: /bin/bash
+    command: "-c '/opt/opendaylight/bin/start && tail -f /dev/null'"
+  odl2:
+    image: openalto/odl:0.8.4
+    build: odl/
+    container_name: odl2
+    # network_mode: "service:g2-mininet"
+    entrypoint: /bin/bash
+    command: "-c '/opt/opendaylight/bin/start && tail -f /dev/null'"
   ruciodb:
     image: docker.io/postgres:14
     network_mode: "service:rucio"

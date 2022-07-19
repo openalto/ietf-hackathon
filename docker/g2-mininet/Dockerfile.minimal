@@ -6,6 +6,6 @@ ENV INSTALLER_SWITCHES -p
 
 # Update and install minimal.
 RUN $MININET_INSTALLER $INSTALLER_SWITCHES
-RUN pip3 install pyyaml
+RUN pip3 install pyyaml networkx
 
 VOLUME ["/etc/g2-mininet"]
