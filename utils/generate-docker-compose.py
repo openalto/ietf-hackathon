@@ -337,15 +337,15 @@ class GenerateDockerCompose:
         self.static_services['rucio'] = rucio
 
     def add_xrd_service(self, container_name):
-        xrd_etc_filepath = os.path.abspath(os.path.join(self.base_filepath, 'etc'))
+        xrd_etc_filepath = os.path.abspath(os.path.join(self.base_filepath, '{}/etc'.format(container_name)))
         xrd = {
             **XRD_CONF,
             'container_name': container_name,
             'extra_hosts': self.extra_hosts,
             'volumes': [
                 # move the path to workflow dir
-                '{}/xrootd/certs/hostcert_{}.pem:/tmp/xrdcert.pem:Z'.format(xrd_etc_filepath, container_name),
-                '{}/xrootd/certs/hostcert_{}.key.pem:/tmp/xrdkey.pem:Z'.format(xrd_etc_filepath, container_name),
+                '{}/xrootd/hostcert_{}.pem:/tmp/xrdcert.pem:Z'.format(xrd_etc_filepath, container_name),
+                '{}/xrootd/hostcert_{}.key.pem:/tmp/xrdkey.pem:Z'.format(xrd_etc_filepath, container_name),
                 '{}/xrootd/client.conf:/etc/xrootd/client.conf:Z'.format(xrd_etc_filepath)
             ]}
         # xrd['image'] = IMAGES['xrd']
