@@ -13,7 +13,7 @@ PASSPHRASE = {'key': 'PASSPHRASE', 'val': 123456}
 
 ODL_CONF = {
     'image': 'openalto/odl:0.8.4',
-    'network_mode': "service:mininet",
+    # 'network_mode': "service:mininet",
     'entrypoint': '/bin/bash',
     'command': "-c '/opt/opendaylight/bin/start && tail -f /dev/null'",
 }
