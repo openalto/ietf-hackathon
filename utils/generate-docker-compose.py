@@ -109,11 +109,13 @@ BASE_PATH = {
 }
 
 COMMON_DETAIL_PATH = {
-    'rucio_certs': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs')),
-    'rucio_ca_key': os.path.join(COMMON_BASE_PATH['rucio'], 'rucio_ca.key.pem'),
-    'rucio_ca': os.path.join(COMMON_BASE_PATH['rucio'], 'rucio_ca.pem'),
+    # 'rucio_certs': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs')),
+    'rucio_ca_key': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs/rucio_ca.key.pem')),
+    'rucio_ca': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs/rucio_ca.pem')),
     'xrd_conf': os.path.join(COMMON_BASE_PATH['xrd'], 'client.conf')
 }
+
+print(COMMON_DETAIL_PATH)
 
 STATIC_CONF = {
     'ftsdb': FTSDB_CONF,
