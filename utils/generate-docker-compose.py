@@ -87,7 +87,7 @@ MININET_CONF = {
     'image': 'openalto/g2-mininet:minimal',
     'pid': 'host',
     'cap_add': ['NET_ADMIN', 'SYS_ADMIN'],
-    'privileged': 'true',
+    'privileged': True,
     'entrypoint': '/bin/bash',
     'command': "-c 'service openvswitch-switch start && tail -f /dev/null'"
 }
