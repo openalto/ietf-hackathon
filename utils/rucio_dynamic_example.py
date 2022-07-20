@@ -2,7 +2,7 @@
 """
 This is a simple example to demostrate rucio with containernet.
 """
-# from alto_server import config_server
+from alto_data_source_agent import start_data_source_agent, stop_data_source_agent
 import argparse
 import json
 import requests
@@ -11,7 +11,7 @@ import networkx
 from itertools import groupby
 from socket import gethostbyname
 from node_ext import DynamicDocker
-from mininet.net import Containernet
+from mininet.net import Mininet, Containernet
 from mininet.node import RemoteController
 from mininet.cli import CLI
 from mininet.link import TCLink
@@ -74,6 +74,41 @@ to_controller = """
         }"""
 
 
+def netStartWrapper(fn):
+
+    """
+    Copied from the start method of Containernet with switch.start() deleted
+    """
+    def start(*args, **kwargs):
+        net = args[0]
+        "Start controller and switches."
+        if not net.built:
+            net.build()
+        info('*** Starting controller\n')
+        for controller in net.controllers:
+            info(controller.name + ' ')
+            controller.start()
+        info('\n')
+        info('*** Starting %s switches\n' % len(net.switches))
+        for switch in net.switches:
+            info(switch.name + ' ')
+        started = {}
+        for swclass, switches in groupby(
+                sorted(net.switches,
+                       key=lambda s: str(type(s))), type):
+            switches = tuple(switches)
+            if hasattr(swclass, 'batchStartup'):
+                success = swclass.batchStartup(switches)
+                started.update({s: s for s in success})
+        info('\n')
+        if net.waitConn:
+            net.waitConnected(net.waitConn)
+    return start
+
+
+setattr(Mininet, 'start', netStartWrapper(Mininet.__dict__['start']))
+
+
 class MininetSimulator:
 
     def __init__(self, graph, **params):
@@ -123,10 +158,10 @@ class MininetSimulator:
 
     def startNet(self):
         info('*** Starting network\n')
-        self.start()
+        self.net.start()
 
-        info('*** Configuring ALTO server\n')
-        # config_server(net)
+        info('*** Starting ALTO data source agent for mininet\n')
+        agent_server = start_data_source_agent(self.net)
 
         self.applySTP()
         info('*** Testing connectivity\n')
@@ -134,36 +169,12 @@ class MininetSimulator:
 
         info('*** Running CLI\n')
         CLI(self.net)
+
+        info('*** Stopping ALTO data source agent for mininet\n')
+        stop_data_source_agent(agent_server)
+
         info('*** Stopping network')
         self.net.stop()
-
-    '''
-    Copied from the start method of Containernet with switch.start() deleted
-    '''
-    def start(self):
-        "Start controller and switches."
-        if not self.net.built:
-            self.net.build()
-        info('*** Starting controller\n')
-        for controller in self.net.controllers:
-            info(controller.name + ' ')
-            controller.start()
-        info('\n')
-        info('*** Starting %s switches\n' % len(self.net.switches))
-        for switch in self.net.switches:
-            info(switch.name + ' ')
-            # switch.start( self.net.controllers )
-        started = {}
-        for swclass, switches in groupby(
-                sorted(self.net.switches,
-                       key=lambda s: str(type(s))), type):
-            switches = tuple(switches)
-            if hasattr(swclass, 'batchStartup'):
-                success = swclass.batchStartup(switches)
-                started.update({s: s for s in success})
-        info('\n')
-        if self.net.waitConn:
-            self.net.waitConnected(self.net.waitConn)
 
     """
     Apply STP to the network
