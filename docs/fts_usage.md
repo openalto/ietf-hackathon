@@ -45,6 +45,11 @@ probability getting the "Operation expired" error from XrootD. (See details in
 ## Build Your Own FTS
 
 ```
+$ git clone https://github.com/cern-fts/fts3 [PATH_TO_FTS_REPO]
+
+... Modify FTS source code ...
+
+$ cd ../docker
 $ docker build -t fts-dev rucio-container/fts-dev
 $ docker run -ti --rm -v <PATH_TO_FTS_REPO>:/fts3 fts-dev bash
 [root@22fa4d38704e /]# cd /fts3
@@ -65,7 +70,12 @@ fts container:
     network_mode: "service:rucio"
     volumes:
       - ./fts3config:/etc/fts3/fts3config:Z
-      - <path-to-your-fts-repo>/build/src/server/libfts_server_lib.so.3.11.3:/usr/lib64/libfts_server_lib.so:Z
-      - <path-to-your-fts-repo>/build/src/server/fts_server:/usr/sbin/fts_server:Z
+      - <path-to-your-fts-repo>/build/src/server/libfts_server_lib.so.3.11.3:/usr/lib64/libfts_server_lib.so:z
+      - <path-to-your-fts-repo>/build/src/server/fts_server:/usr/sbin/fts_server:z
 ```
+
+> NOTE: You should mount all the binary files under directories that you
+> modified. e.g., If you modified source code under `fts3/src/config`, you
+> should also mount all the executable binary and dynamic libraries under
+> `fts3/build/src/config`.
 
