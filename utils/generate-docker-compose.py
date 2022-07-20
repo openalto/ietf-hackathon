@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 # coding:utf8
 # usage：python generate-docker-compose.py [path-to-workflow-config]
 import argparse
 import os
+import distutils
 import shutil
 import subprocess
 
@@ -16,6 +18,7 @@ ODL_CONF = {
     # 'network_mode': "service:mininet",
     'entrypoint': '/bin/bash',
     'command': "-c '/opt/opendaylight/bin/start && tail -f /dev/null'",
+    # TODO: mount configuration
 }
 
 RUCIO_CONF = {
@@ -170,6 +173,7 @@ class GenerateDockerCompose:
         self.alto_filepath = ''
         self.rucio_filepath = ''
         self.base_filepath = ''
+        self.common_odl_dirpath = ''
         self.xrd_filepath = ''
         self.xrd_file_map = dict()
 
@@ -257,6 +261,8 @@ class GenerateDockerCompose:
         common_cfg_fts_filepath = '../common/fts/fts3config'
         shutil.copyfile(common_cfg_fts_filepath, os.path.join(self.fts_filepath, 'etc/fts3config'))
 
+        self.common_odl_dirpath = '../common/odl/'
+
     def parse_cfg(self):
         cfg = self.cfg
 
@@ -290,8 +296,19 @@ class GenerateDockerCompose:
                     self.add_rucio_service()
 
     def add_odl_service(self, controller_name):
+        workflow_odl_dirpath = os.path.abspath(os.path.join(self.base_filepath, controller_name))
+
+        # copy common odl related files from /common/odl/ to {workflow}/{odl}/
+        try:
+            distutils.dir_util.copy_tree(self.common_odl_dirpath, workflow_odl_dirpath)
+        except DistutilsFileError:
+            print('Warning: common_odl_dirpath is not a directory')
+
         self.dynamic_services[controller_name] = {
-            **ODL_CONF
+            **ODL_CONF,
+            'volumes': [
+                '{}/etc/org.apache.karaf.features.cfg:/opt/opendaylight/etc/org.apache.karaf.features.cfg'.format(workflow_odl_dirpath)
+            ]
         }
 
     def add_static_service(self, static_type):
@@ -426,7 +443,13 @@ class GenerateDockerCompose:
 
     def save(self):
         dynamic_cfg = {
-            'services': self.dynamic_services
+            'services': self.dynamic_services,
+            'networks': {
+                'default': {
+                    'name': 'static_default',
+                    'external': True
+                }
+            }
         }
         static_cfg = {
             'services': self.static_services
@@ -437,7 +460,9 @@ class GenerateDockerCompose:
     def save_docker_compose_file(self, mode, cfg):
 
         dp_fn = '{}-docker-compose.yml'.format(mode)
-        filepath = os.path.join(self.docker_filepath, dp_fn)
+        dirpath = os.path.join(self.docker_filepath, mode)
+        check_or_create_filepath(dirpath)
+        filepath = os.path.join(dirpath, dp_fn)
         with open(filepath, 'w') as f:
             # https://qa.1r1g.com/sf/ask/946317361/
             yaml.Dumper.ignore_aliases = lambda *args: True

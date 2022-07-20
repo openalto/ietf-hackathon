@@ -1,9 +1,9 @@
 #!/bin/bash
 
-COMPOSE_FILE=../docker/docker-compose-with-fts.yml
-FTS_NODE=rucio
-FTS_HOST=fts
-FTSDB_NODE=ftsdb
+COMPOSE_FILE=${COMPOSE_FILE:../docker/docker-compose-with-fts.yml}
+FTS_NODE=${FTS_NODE:rucio}
+FTS_HOST=${FTS_HOST:fts}
+FTSDB_NODE=${FTSDB_NODE:ftsdb}
 
 init_fts () {
     docker-compose -f $COMPOSE_FILE exec $FTS_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
@@ -15,7 +15,7 @@ gen_test_file () {
     local target_se=$1
     local filename=$2
     local filesize=$3
-    docker-compose -f $COMPOSE_FILE exec $target_se dd if=/dev/urandom of=/rucio/$filename bs=1M count=$filesize
+    docker exec -ti $target_se dd if=/dev/urandom of=/rucio/$filename bs=1M count=$filesize
 }
 
 submit_test_transfers () {
@@ -27,7 +27,7 @@ submit_test_transfers () {
 
 clean_up_storage () {
     local target_se=$1
-    docker-compose -f $COMPOSE_FILE exec $target_se bash -c 'rm /rucio/*'
+    docker exec -ti $target_se bash -c 'rm /rucio/*'
 }
 
 gen_batch_files () {
