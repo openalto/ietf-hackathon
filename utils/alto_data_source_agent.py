@@ -11,7 +11,7 @@ LINK_REQUIRED_KEYS = ['src', 'dst', 'type']
 
 
 def get_link_type(domain1, domain2):
-    if not domain1 and not domain2 and domain1 != domain2:
+    if domain1 and domain2 and domain1 != domain2:
         return 'interdomain'
     else:
         return 'intradomain'
@@ -100,10 +100,9 @@ class DataSourceAgent(Thread):
                     'src': l.intf1.name,
                     'dst': l.intf2.name,
                     'type': get_link_type(
-                        switch_dict.get(intf1.node.name, dict()).get('domain', None),
-                        switch_dict.get(intf2.node.name, dict()).get('domain', None)
+                        switch_dict.get(l.intf1.node.name, dict()).get('domain', None),
+                        switch_dict.get(l.intf2.node.name, dict()).get('domain', None)
                     ),
-                    **{k: v for k, v in l.params.items() if k not in LINK_REQUIRED_KEYS}
                 })
             except:
                 pass
