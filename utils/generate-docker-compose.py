@@ -6,6 +6,7 @@ import os
 import distutils
 import shutil
 import subprocess
+from distutils.errors import DistutilsFileError
 
 import yaml
 
@@ -18,7 +19,6 @@ ODL_CONF = {
     # 'network_mode': "service:mininet",
     'entrypoint': '/bin/bash',
     'command': "-c '/opt/opendaylight/bin/start && tail -f /dev/null'",
-    # TODO: mount configuration
 }
 
 RUCIO_CONF = {
@@ -337,7 +337,10 @@ class GenerateDockerCompose:
     def add_rucio_service(self):
         rucio = {
             **RUCIO_CONF,
-            'extra_hosts': self.extra_hosts,
+            'extra_hosts': sorted([
+                '%s:%s' % (k, v if k not in VALID_STATIC_TYPES else '127.0.0.1')
+                for k, v in self.extra_hosts.items()
+            ]),
             'volumes': [
                 # workflow dir
                 '{}/tools:/opt/rucio/tools:Z'.format(self.rucio_filepath),
@@ -358,7 +361,10 @@ class GenerateDockerCompose:
         xrd = {
             **XRD_CONF,
             'container_name': container_name,
-            'extra_hosts': self.extra_hosts,
+            'extra_hosts': sorted([
+                '%s:%s' % (k, v if k != container_name else '127.0.0.1')
+                for k, v in self.extra_hosts.items()
+            ]),
             'volumes': [
                 # move the path to workflow dir
                 '{}/xrootd/hostcert_{}.pem:/tmp/xrdcert.pem:Z'.format(xrd_etc_filepath, container_name),
@@ -377,7 +383,7 @@ class GenerateDockerCompose:
         domains = cfg['dynamic']['domains']
         # print(domains)
         net_host_map = dict()
-        extra_hosts = list()
+        extra_hosts = dict()
         for domain in domains:
             hosts = domain['hosts']
             net_name = domain['name']
@@ -388,14 +394,14 @@ class GenerateDockerCompose:
                 #                                                        host_name=host_name)
                 name = host['name']
                 if host_type == 'rucio':
-                    extra_hosts += [str('rucio:%s' % ip), 'ruciodb:%s' % ip,
-                                    'fts:%s' % ip, 'ftsdb:%s' % ip,
-                                    'activemq:%s' % ip]
+                    extra_hosts['rucio'] = ip
+                    extra_hosts['ruciodb'] = ip
+                    extra_hosts['fts'] = ip
+                    extra_hosts['ftsdb'] = ip
+                    extra_hosts['activemq'] = ip
                 elif host_type == 'xrd':
-                    extra_hosts += ['%s:%s' % (name, ip)]
+                    extra_hosts[name] = ip
 
-        extra_hosts = list(set(extra_hosts))
-        extra_hosts.sort()
         self.net_host_map = net_host_map
         self.extra_hosts = extra_hosts
 
