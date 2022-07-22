@@ -103,6 +103,8 @@ class DataSourceAgent(Thread):
                         switch_dict.get(l.intf1.node.name, dict()).get('domain', None),
                         switch_dict.get(l.intf2.node.name, dict()).get('domain', None)
                     ),
+                    'bandwidth': l.intf1.params.get('bw', None),
+                    'latency': l.intf1.params.get('delay', None),
                 })
             except:
                 pass
