@@ -1,6 +1,10 @@
 name: test1
 static:
   - fts
+  - mininet
+  - ruciodb
+  - ftsdb
+  - activemq
 dynamic:
   domains:
     - name: net1
