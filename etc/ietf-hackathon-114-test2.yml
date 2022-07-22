@@ -1,30 +1,69 @@
-name: test2
-static: fts
+name: test
+static:
+  - fts
+  - mininet
+  - ruciodb
+  - ftsdb
+  - activemq
 dynamic:
-  hosts:
-    - name: "rucio"
-      type: "rucio"
-      ip: 10.0.0.250
-    - name: "xrd1"
-      type: "xrd"
-      ip: 10.0.0.251
-    - name: "xrd2"
-      type: "xrd"
-      ip: 10.0.0.252
-    - name: "xrd3"
-      type: xrd
-      ip: 10.0.0.253
-  links:
-    - endpoints: ["xrd1", "s1"]
-    - endpoints: ["xrd2", "s2"]
-    - endpoints: ["xrd3", "s4"]
-    - endpoints: ["rucio", "s3"]
-    - endpoints: ["s1", "s3"]
-      latency: 5 # ms
-      bandwidth: 10 # Mbps
+  domains:
+    - name: net1
+      controller:
+        name: odl1
+      hosts:
+        - name: "rucio"
+          type: "rucio"
+          ip: 10.0.0.250
+          #
+        - name: "xrd1"
+          type: "xrd"
+          ip: 10.0.0.251
+      links:
+        - endpoints: ["rucio", "s1"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["s1", "s2"]
+        - endpoints: ["xrd1", "s2"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+    - name: net2
+      controller:
+        name: odl2
+      hosts:
+        - name: "xrd2"
+          type: "xrd"
+          ip: 10.0.0.252
+        - name: "xrd3"
+          type: "xrd"
+          ip: 10.0.0.253
+      links:
+        - endpoints: ["xrd2", "s3"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["s3", "s4"]
+        - endpoints: ["xrd3", "s4"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+    - name: net3
+      controller:
+        name: odl3
+      hosts:
+        - name: "xrd4"
+          type: "xrd"
+          ip: 10.0.0.254
+        - name: "xrd5"
+          type: "xrd"
+          ip: 10.0.0.1
+      links:
+        - endpoints: ["xrd4", "s5"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["s5", "s6"]
+        - endpoints: ["xrd5", "s6"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+  interdomain:
     - endpoints: ["s2", "s3"]
-      latency: 5 
-      bandwidth: 10
-    - endpoints: ["s3", "s4"]
-      latency: 5
-      bandwidth: 10
+    - endpoints: ["s4", "s5"]
+    - endpoints: ["s6", "s1"]
+
