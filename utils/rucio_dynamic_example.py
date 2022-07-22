@@ -19,66 +19,71 @@ from mininet.log import info, setLogLevel
 
 setLogLevel('info')
 
-# url_format % (address, vSwitch, flow_id)
-url_format = "http://%s:8181/restconf/config/opendaylight-inventory:nodes/node/openflow:%s/table/0/flow/%s"
+OPENFLOW_VERSION = "OpenFlow13"
+ODL_AUTH = ("admin", "admin")
 
-# flow_format % (flow_id, ingress_port, ethertype, action)
-flow_format = """
-{"flow":
+BROADCAST_PRIORITY = 100
+DIP_FORWARD_PRIORITY = 200
+
+# url_format % (address, vSwitch, flow_id)
+FLOW_URL_FORMAT = "http://%s:8181/restconf/config/opendaylight-inventory:nodes/node/openflow:%s/table/0/flow/%s"
+
+# flow_format % (flow_id, priority, match, action)
+FLOW_FORMAT = """
     {
-        "id": "%s",
-        "priority": 100,
-        "table_id": 0,
-        "match": {
-            "in-port": "%s",
-            "ethernet-match": {
-                "ethernet-type": {
-                    "type": %s
-                }
-            }
-        },
-        "instructions": {
-            "instruction": [
-                {
-                    "order": 0,
-                    "apply-actions": {
-                        "action": [
-                            %s
-                        ]
+        "flow":{
+            "id": "%s",
+            "priority": %s,
+            "table_id": 0,
+            "match": {
+                %s
+            },
+            "instructions": {
+                "instruction": [
+                    {
+                        "order": 0,
+                        "apply-actions": {
+                            "action": [
+                                %s
+                            ]
+                        }
                     }
-                }
-            ]
+                ]
+            }
         }
     }
-}
+"""
+
+DIP_MATCH_FORMAT = """
+    "ethernet-match": {
+        "ethernet-type": {
+            "type": 2048
+        }
+    },
+    "ipv4-destination": "%s/32"
+"""
+
+IN_PORT_MATCH_FORMAT = """
+    "in-port": %s
 """
 
 # action_format % (order, egress_port)
-action_format = """
-        {
-             "order": %s,
-             "output-action": {
-                 "max-length": 65535,
-                 "output-node-connector": "%s"
-             }
-        },"""
-
-# to_controller % (order)
-to_controller = """
-        {
-            "order": %s,
-            "output-action": {
-                "max-length": 65535,
-                "output-node-connector": "CONTROLLER"
-            }
-        }"""
+TO_PORT_ACTION_FORMAT = """
+    {
+         "order": %s,
+         "output-action": {
+             "max-length": 65535,
+             "output-node-connector": "%s"
+         }
+    }
+"""
 
 
 def netStartWrapper(fn):
-
     """
     Copied from the start method of Containernet with switch.start() deleted
     """
+
     def start(*args, **kwargs):
         net = args[0]
         "Start controller and switches."
@@ -103,6 +108,7 @@ def netStartWrapper(fn):
         info('\n')
         if net.waitConn:
             net.waitConnected(net.waitConn)
+
     return start
 
 
@@ -118,6 +124,7 @@ class MininetSimulator:
     """
     Add hosts, switches, links according to the networkx graph.
     """
+
     def buildNet(self):
         controllers = set()
         nodes = self.graph.nodes()
@@ -141,7 +148,7 @@ class MininetSimulator:
                 # If you want different switch connected to different controller,
                 # you must switch.start() with your controller.
                 # In net.start(), all switches are connected to the same controller.
-                self.net.addSwitch(node, protocols="OpenFlow13").start(
+                self.net.addSwitch(node, protocols=OPENFLOW_VERSION).start(
                     controllers=[self.net.get(nodes[node]['controller'])]
                 )
 
@@ -164,6 +171,7 @@ class MininetSimulator:
         agent_server = start_data_source_agent(self.net)
 
         self.applySTP()
+        self.applyIPForward()
         info('*** Testing connectivity\n')
         self.net.pingAll()
 
@@ -177,7 +185,7 @@ class MininetSimulator:
         self.net.stop()
 
     """
-    Apply STP to the network
+    Enable STP to the network
     """
     def applySTP(self):
         self.graph = networkx.minimum_spanning_tree(self.graph)
@@ -189,20 +197,43 @@ class MininetSimulator:
             for d in adj.keys():
                 ports.add(adj[d][s])
             for ingress_port in ports:
-                enable_broadcast(nodes[s]["controller"], s[1:], ingress_port, ports-{ingress_port})
+                enable_broadcast(nodes[s]["controller"], s[1:], ingress_port, ports - {ingress_port})
+
+    """
+    Enable IP forwarding on the switches
+    """
+    def applyIPForward(self):
+        nodes = self.graph.nodes()
+        edges = self.graph.edges()
+        switches = [n for n in nodes if 1 != networkx.degree(self.graph, n)]
+        hosts = [n for n in nodes if 1 == networkx.degree(self.graph, n)]
+        for s in switches:
+            for h in hosts:
+                passing_nodes = networkx.shortest_path(self.graph, s, h)
+                dip = nodes[h]["ip"]
+                egress_port = edges[passing_nodes[0], passing_nodes[1]][s]
+                enable_dip_forward(nodes[s]["controller"], s[1:], dip, egress_port)
+
+
+def enable_dip_forward(address, vSwitch, dip, egress_port):
+    match = DIP_MATCH_FORMAT % dip
+    action = TO_PORT_ACTION_FORMAT % (0, egress_port)
+    payload = FLOW_FORMAT % (f"s{vSwitch}-{dip[-3:]}", DIP_FORWARD_PRIORITY, match, action)
+    r = requests.put(auth=ODL_AUTH,
+                     json=json.loads(payload),
+                     url=FLOW_URL_FORMAT % (address, vSwitch, f"s{vSwitch}-{dip[-3:]}"))
 
 
 def enable_broadcast(address, vSwitch, ingress_port, egress_ports):
+    match = IN_PORT_MATCH_FORMAT % ingress_port
     action = ""
     for order, egress_port in enumerate(egress_ports):
-        action += action_format % (order, egress_port)
+        action += TO_PORT_ACTION_FORMAT % (order, egress_port) + ","
     action = action[:-1]
-    ip_payload = flow_format % (f"ip-{ingress_port}", ingress_port, 2048, action)
-    requests.put(auth=("admin", "admin"), json=json.loads(ip_payload), url=url_format % (address, vSwitch, "ip-%s"%ingress_port))
-
-    action += "," + to_controller % (len(egress_ports))
-    arp_payload = flow_format % (f"arp-{ingress_port}", ingress_port, 2054, action)
-    requests.put(auth=("admin", "admin"), json=json.loads(arp_payload), url=url_format % (address, vSwitch, "arp-%s"%ingress_port))
+    payload = FLOW_FORMAT % (f"broadcast-port-{ingress_port}", BROADCAST_PRIORITY, match, action)
+    requests.put(auth=ODL_AUTH,
+                 json=json.loads(payload),
+                 url=FLOW_URL_FORMAT % (address, vSwitch, f"broadcast-port-{ingress_port}"))
 
 
 def yml_to_graph(yml, mode="file" or "str"):
