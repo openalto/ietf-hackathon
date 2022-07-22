@@ -222,7 +222,6 @@ def enable_dip_forward(address, vSwitch, dip, egress_port):
     r = requests.put(auth=ODL_AUTH,
                      json=json.loads(payload),
                      url=FLOW_URL_FORMAT % (address, vSwitch, f"s{vSwitch}-{dip[-3:]}"))
-    print(r.status_code)
 
 
 def enable_broadcast(address, vSwitch, ingress_port, egress_ports):
@@ -232,7 +231,6 @@ def enable_broadcast(address, vSwitch, ingress_port, egress_ports):
         action += TO_PORT_ACTION_FORMAT % (order, egress_port) + ","
     action = action[:-1]
     payload = FLOW_FORMAT % (f"broadcast-port-{ingress_port}", BROADCAST_PRIORITY, match, action)
-    print(payload)
     requests.put(auth=ODL_AUTH,
                  json=json.loads(payload),
                  url=FLOW_URL_FORMAT % (address, vSwitch, f"broadcast-port-{ingress_port}"))
