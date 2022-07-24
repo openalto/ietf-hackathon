@@ -18,7 +18,14 @@ else
 	@echo "Image openalto/g2-mininet exists."
 endif
 
-build: build-rucio build-g2-mininet
+build-g2-mininet-minimal:
+ifeq ($(shell docker images openalto/g2-mininet:minimal -q),)
+	docker build -t openalto/g2-mininet:minimal -f g2-mininet/Dockerfile.minimal g2-mininet/
+else
+	@echo "Image openalto/g2-mininet exists."
+endif
+
+build: build-rucio build-g2-mininet-minimal
 
 update-rucio:
 	docker build -t openalto/rucio-dev rucio-containers/dev/
@@ -27,5 +34,8 @@ update-rucio:
 update-g2-mininet:
 	docker build -t openalto/g2-mininet g2-mininet/
 
-update: upate-rucio update-g2-mininet
+update-g2-mininet-minimal:
+	docker build -t openalto/g2-mininet:minimal -f g2-mininet/Dockerfile.minimal g2-mininet/
+
+update: upate-rucio update-g2-mininet-minimal
 
