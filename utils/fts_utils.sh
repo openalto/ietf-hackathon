@@ -1,12 +1,13 @@
 #!/bin/bash
 
 COMPOSE_FILE=${COMPOSE_FILE:-../docker/docker-compose-with-fts.yml}
-FTS_NODE=${FTS_NODE:-rucio}
+RUCIO_NODE=${FTS_NODE:-rucio}
+FTS_NODE=${FTS_NODE:-fts}
 FTS_HOST=${FTS_HOST:-fts}
 FTSDB_NODE=${FTSDB_NODE:-ftsdb}
 
 init_fts () {
-    docker-compose -p static exec $FTS_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
+    docker-compose -p static exec $RUCIO_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
     docker-compose -p static exec $FTS_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
     docker-compose -p static exec $FTS_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
 }
@@ -71,7 +72,7 @@ config_fts_link () {
     local max_active=$4
     local opt_mode=${5:-2}
     local msg='{"symbolicname":"'$source_se'-'$dest_se'","source":"'$source_se'","destination":"'$dest_se'","min_active":'$min_active',"max_active":'$max_active',"optimizer_mode":'$opt_mode'}'
-    docker-compose -p static exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/config/links
+    docker-compose -p static exec $RUCIO_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/config/links
     set +f
 }
 
@@ -80,6 +81,6 @@ config_optimizer () {
     local dest_se=$2
     local active=$3
     local msg='{"source_se":"'$source_se'","dest_se":"'$dest_se'","active":'$active'}'
-    docker-compose -p static exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/optimizer/current
+    docker-compose -p static exec $RUCIO_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/optimizer/current
 }
 

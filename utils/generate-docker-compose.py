@@ -173,9 +173,15 @@ class GenerateDockerCompose:
         self.alto_filepath = ''
         self.rucio_filepath = ''
         self.base_filepath = ''
+        self.common_fts_dirpath = ''
         self.common_odl_dirpath = ''
         self.xrd_filepath = ''
         self.xrd_file_map = dict()
+        # fts modification
+        self.is_fts_mod = False
+        self.fts_mod_components = []
+        self.fts_mod_rootpath = ''
+        self.fts_mod_mounts = dict()
 
     def generate(self, filepath):
         """
@@ -258,10 +264,43 @@ class GenerateDockerCompose:
         check_or_create_filepath(self.alto_filepath)
 
         # copy configuration fts file from /common/fts/fts3config
-        common_cfg_fts_filepath = '../common/fts/fts3config'
-        shutil.copyfile(common_cfg_fts_filepath, os.path.join(self.fts_filepath, 'etc/fts3config'))
+        self.common_fts_dirpath = '../common/fts/'
+        # shutil.copyfile(common_cfg_fts_filepath, os.path.join(self.fts_filepath, 'etc/fts3config'))
 
         self.common_odl_dirpath = '../common/odl/'
+
+        fts_mod_cfg = cfg.get('fts_mod')
+        if fts_mod_cfg:
+            self.is_fts_mod = True
+
+            assert 'path' in fts_mod_cfg, 'Must set the root path of modified fts'
+            self.fts_mod_rootpath = fts_mod_cfg.get('path')
+            assert type(self.fts_mod_rootpath) is str, 'Root path must be a string. path: {}'.format(self.fts_mod_rootpath)
+            assert os.path.exists(self.fts_mod_rootpath), 'Root path does not exist'
+
+            assert 'components' in fts_mod_cfg, 'Must set modified components in fts'
+            self.fts_mod_components = fts_mod_cfg.get('components')
+            assert type(self.fts_mod_components) is list, 'Components must be an array'
+            for component in self.fts_mod_components:
+                if component == 'db/schema/mysql':
+                    component_path = os.path.join(self.fts_mod_rootpath, 'src', component)
+                    assert os.path.isdir(component_path), 'Component {} does not exist'.format(component)
+                    self.fts_mod_mounts[component_path] = '/usr/share/fts-mysql'
+                    continue
+
+                component_build_path = os.path.join(self.fts_mod_rootpath, 'build/src', component)
+                assert os.path.isdir(component_build_path), 'Component {} does not exist or was not built'.format(component)
+                for component_file in os.listdir(component_build_path):
+                    component_filepath = os.path.join(component_build_path, component_file)
+                    if (not os.path.islink(component_filepath)
+                            and os.path.isfile(component_filepath)
+                            and os.access(component_filepath, os.X_OK)):
+                        if component_file.startswith('fts_'):
+                            self.fts_mod_mounts[component_filepath] = os.path.join('/usr/sbin', component_file)
+                        elif component_file.startswith('lib'):
+                            self.fts_mod_mounts[component_filepath] = os.path.join('/usr/lib64', component_file)
+                        else:
+                            self.fts_mod_mounts[component_filepath] = os.path.join('/usr/bin', component_file)
 
     def parse_cfg(self):
         cfg = self.cfg
@@ -327,11 +366,20 @@ class GenerateDockerCompose:
         }
 
     def add_fts_service(self):
+        # copy common odl related files from /common/fts/ to {workflow}/fts/
+        try:
+            distutils.dir_util.copy_tree(self.common_fts_dirpath, self.fts_filepath)
+        except DistutilsFileError:
+            print('Warning: common_fts_dirpath is not a directory')
+
         self.static_services['fts'] = {
             **FTS_CONF,
             'volumes': [
-                '{}/etc/fts3config:/etc/fts3/fts3config:Z'.format(self.fts_filepath)
-            ],
+                '{}/etc/fts3config:/etc/fts3/fts3config:Z'.format(self.fts_filepath),
+                '{}/etc/fts3rest.conf:/etc/fts3/fts3rest.conf:Z'.format(self.fts_filepath),
+                '{}/etc/fts3restconfig:/etc/fts3/fts3restconfig:Z'.format(self.fts_filepath),
+                '{}/patch/jobsubmitter.py:/usr/lib/python3.6/site-packages/fts3/cli/jobsubmitter.py:Z'.format(self.fts_filepath),
+            ] + sorted(["%s:%s:z" % (k, v) for k, v in self.fts_mod_mounts.items()]),
         }
 
     def add_rucio_service(self):
