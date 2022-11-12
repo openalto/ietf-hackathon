@@ -1,21 +1,23 @@
 #!/bin/bash
 
 COMPOSE_FILE=${COMPOSE_FILE:-../docker/docker-compose-with-fts.yml}
-RUCIO_NODE=${FTS_NODE:-rucio}
+RUCIO_NODE=${RUCIO_NODE:-rucio}
 FTS_NODE=${FTS_NODE:-fts}
 FTS_HOST=${FTS_HOST:-fts}
 FTSDB_NODE=${FTSDB_NODE:-ftsdb}
 
 init_fts () {
+    echo $FTS_NODE
     docker-compose -p static exec $RUCIO_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
-    docker-compose -p static exec $FTS_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
-    docker-compose -p static exec $FTS_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
+    docker-compose -p static exec $RUCIO_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
+    docker-compose -p static exec $RUCIO_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
 }
 
 gen_test_file () {
     local target_se=$1
     local filename=$2
     local filesize=$3
+    docker exec -ti $target_se mkdir -p /rucio 
     docker exec -ti $target_se dd if=/dev/urandom of=/rucio/$filename bs=1M count=$filesize
 }
 
@@ -23,7 +25,7 @@ submit_test_transfers () {
     local source_se=$1
     local dest_se=$2
     local filename=$3
-    docker-compose -p static exec $FTS_NODE fts-rest-transfer-submit -v -s https://$FTS_HOST:8446 root://$source_se//rucio/$filename root://$dest_se//rucio/$filename
+    docker-compose -p static exec $RUCIO_NODE fts-rest-transfer-submit -v -s https://$FTS_HOST:8446 root://$source_se//rucio/$filename root://$dest_se//rucio/$filename
 }
 
 clean_up_storage () {

@@ -4,6 +4,7 @@
 import argparse
 import os
 import distutils
+import distutils.dir_util
 import shutil
 import subprocess
 from distutils.errors import DistutilsFileError
@@ -15,7 +16,7 @@ VALID_HOST_TYPES = ['rucio', 'xrd']
 PASSPHRASE = {'key': 'PASSPHRASE', 'val': 123456}
 
 ODL_CONF = {
-    'image': 'openalto/odl:0.8.4',
+    'image': 'fno2010/odl:0.8.4',
     # 'network_mode': "service:mininet",
     'entrypoint': '/bin/bash',
     'command': "-c '/opt/opendaylight/bin/start && tail -f /dev/null'",
