@@ -2,12 +2,100 @@
 
 Check [`environment_setup.md`](environment_setup.md) for prerequisite.
 
-## Docker Environment Setup
+## Basic Setup
+
+### Prerequisite
+
+Make sure you have 
+
+```
+docker-compose >= 2.11.2
+python >= 3.10
+```
+
+### Build Docker Images
 
 ```
 $ cd docker
-$ docker-compose -f docker-compose-with-fts.yml up -d
+$ make
 ```
+
+### Write Workflow Configuration File
+
+See example in `etc/sc22.yml`
+
+### Generate Workflow Docker-Compose Files
+
+```
+$ cd utils
+$ ./generate-docker-compose.py -f ../etc/sc22.yml
+```
+
+Expected results: You should be able to see `workflow/sc22-dev/docker/{static/static-docker-compose.yml, dynamic/dynamic-docker-compose.yml}`.
+
+### Launch Docker Images and Network
+
+```
+$ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml up -d
+$ docker-compose -f workflow/sc22-dev/docker/dynamic/dynamic-docker-compose.yml up -d
+$ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml \
+  exec mininet python3 /utils/rucio_dynamic_example.py --str "$(cat etc/sc22.yml)"
+```
+
+Expected results: You should be able to enter the mininet CLI. Try `pingall` to test connectivity between the hosts.
+
+### Configure Rucio/FTS and Generate Workloads
+
+**Import helper functions**
+
+```
+$ cd utils
+$ . fts_utils.sh
+```
+
+**Initialize Rucio**
+
+```
+init_fts
+```
+
+Expected result: You should see some output with certificate information and API calls.
+
+**Generate data**
+
+```
+$ gen_batch_files xrd1 10 48 1 testfile   # generate 48x10M files (testfile1 to testfile48)
+```
+
+Expected results: You should see output of `dd` command
+
+**Configure Optimizer**
+
+```
+$ config_fts_link root://xrd1 '*' 2 8    # configure working range for link set xrd1 -> *
+$ config_optimizer root://xrd1 root://xrd2 8    # preconfigure active of xrd1 -> xrd2 to 8
+$ config_optimizer root://xrd1 root://xrd3 2    # preconfigure active of xrd1 -> xrd3 to 2
+```
+
+Expected results: You should see some JSON results.
+
+**Submit Transfers**
+
+```
+$ submit_batch_transfer xrd1 xrd3 48 1 testfile
+$ submit_batch_transfer xrd1 xrd2 48 1 testfile
+```
+
+You should see some API calls. Check [FTS web UI](https://localhost:8449/fts3/ftsmon/#/) to see whether the jobs show up.
+
+### Clean Up
+
+```
+(containernet) exit
+$ docker-compose -f workflow/sc22-dev/docker/dynamic/dynamic-docker-compose.yml down
+$ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml down
+```
+
 
 ## Network Topology Setup
 
