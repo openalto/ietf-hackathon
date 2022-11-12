@@ -106,7 +106,7 @@ services:
       - MYSQL_DATABASE=fts
   xrd1:
     image: openalto/xrootd
-    build: rucio-containers/dev/
+    build: rucio-containers/xrootd/
     container_name: xrd1
     extra_hosts:
       - "ruciodb:10.0.0.250"
