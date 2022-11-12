@@ -6,15 +6,16 @@ FTS_HOST=${FTS_HOST:-fts}
 FTSDB_NODE=${FTSDB_NODE:-ftsdb}
 
 init_fts () {
-    docker-compose -p static exec $FTS_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
-    docker-compose -p static exec $FTS_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
-    docker-compose -p static exec $FTS_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
+    docker exec $FTS_NODE xrdgsiproxy init -bits 2048 -valid 9999:00 -cert /opt/rucio/etc/usercert.pem  -key /opt/rucio/etc/userkey.pem
+    docker exec $FTS_NODE fts-rest-whoami -v -s https://$FTS_HOST:8446
+    docker exec $FTS_NODE fts-rest-delegate -vf -s https://$FTS_HOST:8446 -H 9999
 }
 
 gen_test_file () {
     local target_se=$1
     local filename=$2
     local filesize=$3
+    docker exec -t $target_se mkdir -p /rucio
     docker exec -ti $target_se dd if=/dev/urandom of=/rucio/$filename bs=1M count=$filesize
 }
 
@@ -22,7 +23,7 @@ submit_test_transfers () {
     local source_se=$1
     local dest_se=$2
     local filename=$3
-    docker-compose -p static exec $FTS_NODE fts-rest-transfer-submit -v -s https://$FTS_HOST:8446 root://$source_se//rucio/$filename root://$dest_se//rucio/$filename
+    docker exec $FTS_NODE fts-rest-transfer-submit -v -s https://$FTS_HOST:8446 root://$source_se//rucio/$filename root://$dest_se//rucio/$filename
 }
 
 clean_up_storage () {
@@ -60,7 +61,7 @@ submit_batch_transfer () {
 
 dump_optimizer_hist () {
     local sql_stmt='select * from t_optimizer_evolution where datetime > '"'"$1"'"
-    docker-compose -p static exec $FTSDB_NODE bash -c 'echo "'"$sql_stmt"'" | mysql -u fts --password=fts fts'
+    docker exec $FTSDB_NODE bash -c 'echo "'"$sql_stmt"'" | mysql -u fts --password=fts fts'
 }
 
 config_fts_link () {
@@ -80,6 +81,6 @@ config_optimizer () {
     local dest_se=$2
     local active=$3
     local msg='{"source_se":"'$source_se'","dest_se":"'$dest_se'","active":'$active'}'
-    docker-compose -p static exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/optimizer/current
+    docker exec $FTS_NODE curl --capath /etc/grid-security/certificates -E /tmp/x509up_u0 --cacert /tmp/x509up_u0 -H "Content-Type: application/json" -d "$msg" https://fts:8446/optimizer/current
 }
 

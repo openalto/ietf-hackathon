@@ -4,6 +4,7 @@
 import argparse
 import os
 import distutils
+import distutils.dir_util
 import shutil
 import subprocess
 from distutils.errors import DistutilsFileError
@@ -15,7 +16,8 @@ VALID_HOST_TYPES = ['rucio', 'xrd']
 PASSPHRASE = {'key': 'PASSPHRASE', 'val': 123456}
 
 ODL_CONF = {
-    'image': 'openalto/odl:0.8.4',
+    #'image': 'openalto/odl:0.8.4',
+    'image': 'fno2010/odl:0.8.4',
     # 'network_mode': "service:mininet",
     'entrypoint': '/bin/bash',
     'command': "-c '/opt/opendaylight/bin/start && tail -f /dev/null'",
@@ -40,7 +42,7 @@ RUCIO_CONF = {
         'RDBMS=postgres14'
     ],
 
-    'build': 'rucio-containers/dev',
+    # 'build': 'rucio-containers/dev',
     'cap_add': ['NET_ADMIN', ],
     'container_name': 'rucio'
 }
@@ -53,12 +55,14 @@ RUCIODB_CONF = {
         'POSTGRES_DB=rucio',
         'POSTGRES_PASSWORD=secret'
     ],
+    'container_name': 'ruciodb',
     'command': ["-c", "fsync=off", "-c", "synchronous_commit=off", "-c", "full_page_writes=off"],
 }
 
 FTS_CONF = {
     'image': 'docker.io/rucio/fts',
     'network_mode': "service:rucio",
+    'container_name': 'fts'
 }
 FTSDB_CONF = {
     'image': 'docker.io/mysql:8',
@@ -69,7 +73,8 @@ FTSDB_CONF = {
         'MYSQL_PASSWORD=fts',
         'MYSQL_ROOT_PASSWORD=fts',
         'MYSQL_DATABASE=fts'
-    ]
+    ],
+    'container_name': 'ftsdb',
 }
 
 ACTIVEMQ_CONF = {
@@ -83,7 +88,8 @@ ACTIVEMQ_CONF = {
         'ACTIVEMQ_USERS_receiver=supersecret',
         'ACTIVEMQ_GROUPS_reads=receiver',
         'ACTIVEMQ_CONFIG_SCHEDULERENABLED=true'
-    ]
+    ],
+    'container_name': 'activemq',
 }
 
 MININET_CONF = {
@@ -92,7 +98,8 @@ MININET_CONF = {
     'cap_add': ['NET_ADMIN', 'SYS_ADMIN'],
     'privileged': True,
     'entrypoint': '/bin/bash',
-    'command': "-c 'service openvswitch-switch start && tail -f /dev/null'"
+    'command': "-c 'service openvswitch-switch start && tail -f /dev/null'",
+    'container_name': 'mininet',
 }
 
 XRD_CONF = {
@@ -308,7 +315,8 @@ class GenerateDockerCompose:
             **ODL_CONF,
             'volumes': [
                 '{}/etc/org.apache.karaf.features.cfg:/opt/opendaylight/etc/org.apache.karaf.features.cfg'.format(workflow_odl_dirpath)
-            ]
+            ],
+            'container_name': controller_name
         }
 
     def add_static_service(self, static_type):
