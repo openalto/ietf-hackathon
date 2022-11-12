@@ -13,12 +13,12 @@ $ docker-compose -f docker-compose-with-fts.yml up -d
 
 *Test network connectivity*
 ```
-$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /util/rucio_example.py
+$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /utils/rucio_example.py
 ```
 
 *Test network connectivity(topology from .yml workflow file)*
 ```
-$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /util/rucio_dynamic_example.py --str $(cat ../etc/ietf-hackathon-114-test2.yml)
+$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /utils/rucio_dynamic_example.py --str "$(cat ../etc/ietf-hackathon-114-test2.yml)"
 ```
 
 ## FTS Usage
