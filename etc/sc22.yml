@@ -1,0 +1,43 @@
+name: sc22-dev
+static:
+  - fts
+  - mininet
+  - ruciodb
+  - ftsdb
+  - activemq
+dynamic:
+  domains:
+    - name: net1
+      controller:
+        name: odl1
+      hosts:
+        - name: "rucio"
+          type: "rucio"
+          ip: 10.0.0.250
+          #
+        - name: "xrd1"
+          type: "xrd"
+          ip: 10.0.0.251
+        - name: "xrd2"
+          type: "xrd"
+          ip: 10.0.0.252
+        - name: "xrd3"
+          type: "xrd"
+          ip: 10.0.0.253
+      links:
+        - endpoints: ["rucio", "s1"]
+          latency: 5 # ms
+          bandwidth: 15 # Mbps
+        - endpoints: ["s1", "s2"]
+          latency: 5 # ms
+          bandwidth: 30 # Mbps
+        - endpoints: ["xrd1", "s2"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["xrd2", "s2"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+        - endpoints: ["xrd3", "s2"]
+          latency: 5 # ms
+          bandwidth: 10 # Mbps
+  interdomain: []
