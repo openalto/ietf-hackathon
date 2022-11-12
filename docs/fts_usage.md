@@ -18,7 +18,7 @@ $ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /util/rucio
 
 *Test network connectivity(topology from .yml workflow file)*
 ```
-$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /util/rucio_dynamic_example.py --str $(cat ../etc/ietf-hackathon-114-test2.yml)")
+$ docker-compose -f docker-compose-with-fts.yml exec mininet python3 /util/rucio_dynamic_example.py --str $(cat ../etc/ietf-hackathon-114-test2.yml)
 ```
 
 ## FTS Usage
@@ -50,7 +50,7 @@ $ git clone https://github.com/cern-fts/fts3 [PATH_TO_FTS_REPO]
 ... Modify FTS source code ...
 
 $ cd ../docker
-$ docker build -t fts-dev rucio-container/fts-dev
+$ docker build -t fts-dev rucio-containers/fts-dev
 $ docker run -ti --rm -v <PATH_TO_FTS_REPO>:/fts3 fts-dev bash
 [root@22fa4d38704e /]# cd /fts3
 [root@22fa4d38704e /]# mkdir -p build
