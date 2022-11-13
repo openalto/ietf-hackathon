@@ -95,7 +95,8 @@ If all transfers fail, it could be the case that the generated certificates are 
 ```
 (on Ubuntu) sudo apt install libfaketime
 
-$ cd workflow/sc22/docker
+$ cd workflow/${WORKFLOW_NAME}/docker
+$ cd workflow/sc22-dev/docker # example
 $ LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1 FAKETIME="-100d" ./generate_xrd_cert.sh
 ```
 
