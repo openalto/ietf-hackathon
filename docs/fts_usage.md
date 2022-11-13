@@ -88,6 +88,17 @@ $ submit_batch_transfer xrd1 xrd2 48 1 testfile
 
 You should see some API calls. Check [FTS web UI](https://localhost:8449/fts3/ftsmon/#/) to see whether the jobs show up.
 
+**Error**
+
+If all transfers fail, it could be the case that the generated certificates are not valid. In that case, use `faketime` to trick openssl to sign the certificate with a past time.
+
+```
+(on Ubuntu) sudo apt install libfaketime
+
+$ cd workflow/sc22/docker
+$ LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1 FAKETIME="-100d" ./generate_xrd_cert.sh
+```
+
 ### Clean Up
 
 ```
