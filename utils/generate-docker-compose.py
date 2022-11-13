@@ -116,7 +116,8 @@ COMMON_DETAIL_PATH = {
     # 'rucio_certs': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs')),
     'rucio_ca_key': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs/rucio_ca.key.pem')),
     'rucio_ca': os.path.abspath(os.path.join(COMMON_BASE_PATH['rucio'], 'etc/certs/rucio_ca.pem')),
-    'xrd_conf': os.path.join(COMMON_BASE_PATH['xrd'], 'client.conf')
+    'xrd_conf': os.path.join(COMMON_BASE_PATH['xrd'], 'client.conf'),
+    'xrdrucio_cfg': os.path.join(COMMON_BASE_PATH['xrd'], 'xrdrucio.cfg'),
 }
 
 print(COMMON_DETAIL_PATH)
@@ -128,7 +129,6 @@ STATIC_CONF = {
 }
 
 VALID_STATIC_TYPES = ['fts', 'mininet'] + [key for key in STATIC_CONF]
-
 
 # RUCIO_PREFIX_PATH = os.path.abspath('../common/rucio')
 # FTS_PREFIX_PATH = os.path.abspath('../common/fts')
@@ -407,6 +407,7 @@ class GenerateDockerCompose:
 
     def add_xrd_service(self, container_name):
         xrd_etc_filepath = os.path.abspath(os.path.join(self.base_filepath, '{}/etc'.format(container_name)))
+        rucio_ca_path = COMMON_DETAIL_PATH['rucio_ca']
         xrd = {
             **XRD_CONF,
             'container_name': container_name,
@@ -418,7 +419,8 @@ class GenerateDockerCompose:
                 # move the path to workflow dir
                 '{}/xrootd/hostcert_{}.pem:/tmp/xrdcert.pem:Z'.format(xrd_etc_filepath, container_name),
                 '{}/xrootd/hostcert_{}.key.pem:/tmp/xrdkey.pem:Z'.format(xrd_etc_filepath, container_name),
-                '{}/xrootd/client.conf:/etc/xrootd/client.conf:Z'.format(xrd_etc_filepath)
+                '{}/xrootd/client.conf:/etc/xrootd/client.conf:Z'.format(xrd_etc_filepath),
+                '{}/xrootd/xrdrucio.cfg:/etc/xrootd/xrdrucio.cfg:Z'.format(xrd_etc_filepath)
             ]}
         # xrd['image'] = IMAGES['xrd']
         # xrd['build'] = "rucio-containers/dev/"
@@ -470,6 +472,10 @@ class GenerateDockerCompose:
             common_xrd_cfg_filepath = COMMON_DETAIL_PATH['xrd_conf']
             print('common_xrd_cfg_filepath', common_xrd_cfg_filepath)
             shutil.copyfile(common_xrd_cfg_filepath, os.path.join(xrd_etc_filepath, 'client.conf'))
+            common_xrdrucio_cfg_filepath = COMMON_DETAIL_PATH['xrdrucio_cfg']
+            print('common_xrdrucio_cfg_filepath', common_xrdrucio_cfg_filepath)
+            shutil.copyfile(common_xrdrucio_cfg_filepath,
+                            os.path.join(xrd_etc_filepath, 'xrdrucio.cfg'))
 
     def generate_key(self):
         self.create_xrd_dir()
@@ -483,7 +489,7 @@ class GenerateDockerCompose:
 
             xrd_key_pem = 'openssl req -new -newkey rsa:2048 -nodes -keyout {out_filename}.key.pem -subj "/CN={host_name}" > {out_filename}.csr'.format(
                 out_filename=out_filename, host_name=host_name)
-            xrd_pem = 'openssl x509 -req -days 9999 -CAcreateserial -extfile <( printf "subjectAltName=DNS:{host_name},DNS:localhost,DNS:{host_name}.default.svc.cluster.local" ) -in {out_filename}.csr -CA {RUCIO_CERTS_CA} -CAkey {RUCIO_CERTS_KEY} -out {out_filename}.pem -passin env:{PASSPHRASE}'.format(
+            xrd_pem = 'openssl x509 -req -days 9999 -CAcreateserial -extfile <(printf "subjectAltName=DNS:{host_name},DNS:localhost") -in {out_filename}.csr -CA {RUCIO_CERTS_CA} -CAkey {RUCIO_CERTS_KEY} -out {out_filename}.pem -passin env:{PASSPHRASE}'.format(
                 host_name=host_name, RUCIO_CERTS_KEY=rucio_certs_key, RUCIO_CERTS_CA=rucio_certs_ca,
                 out_filename=out_filename,
                 PASSPHRASE=PASSPHRASE['key'])
@@ -494,7 +500,7 @@ class GenerateDockerCompose:
 
         subprocess.run('chmod +x {}'.format(generate_xrd_cert_filepath), shell=True)
         subprocess.run(generate_xrd_cert_filepath)
-        os.remove(generate_xrd_cert_filepath)
+        # os.remove(generate_xrd_cert_filepath)
 
     def save(self):
         dynamic_cfg = {
