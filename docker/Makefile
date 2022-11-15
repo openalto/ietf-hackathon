@@ -31,11 +31,14 @@ update-rucio:
 	docker build -t openalto/rucio-dev rucio-containers/dev/
 	docker build -t openalto/xrootd rucio-containers/xrootd/
 
+update-fts:
+	docker build -t openalto/fts rucio-containers/fts
+
 update-g2-mininet:
 	docker build -t openalto/g2-mininet g2-mininet/
 
 update-g2-mininet-minimal:
 	docker build -t openalto/g2-mininet:minimal -f g2-mininet/Dockerfile.minimal g2-mininet/
 
-update: upate-rucio update-g2-mininet-minimal
+update: upate-rucio update-g2-mininet-minimal update-fts
 

@@ -58,7 +58,7 @@ RUCIODB_CONF = {
 }
 
 FTS_CONF = {
-    'image': 'docker.io/rucio/fts',
+    'image': 'openalto/fts',
     'network_mode': "service:rucio",
 }
 FTSDB_CONF = {
