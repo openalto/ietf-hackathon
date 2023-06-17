@@ -42,3 +42,7 @@ update-g2-mininet-minimal:
 
 update: upate-rucio update-g2-mininet-minimal update-fts
 
+include prebuilt.mk
+
+prebuilt: prebuilt-rucio prebuilt-xrootd prebuilt-fts prebuilt-g2-mininet
+

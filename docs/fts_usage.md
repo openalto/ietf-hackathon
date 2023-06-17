@@ -2,22 +2,39 @@
 
 Check [`environment_setup.md`](environment_setup.md) for prerequisite.
 
+> NOTE: Please make sure the full path to your local repo does not include any illegal characters (whitespace or any of `\ / : * ? " < > |`).
+
 ## Basic Setup
 
 ### Prerequisite
 
-Make sure you have 
+Make sure you have
 
 ```
 docker-compose >= 2.11.2
-python >= 3.10
+python >= 3.8
 ```
 
 ### Build Docker Images
 
+First, you should go to the `docker` directory:
+
 ```
 $ cd docker
-$ make
+```
+
+Then, you can have two options:
+
+**Option 1:** Build your own docker images from scratch:
+
+```
+$ make update
+```
+
+Option 2: Use our pre-built docker images:
+
+```
+$ make prebuilt
 ```
 
 ### Write Workflow Configuration File
