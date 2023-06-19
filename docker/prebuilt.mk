@@ -9,7 +9,7 @@ ifeq ($(shell docker images -q -f 'reference=openalto/rucio-dev'))
 	docker rmi openalto/rucio-dev
 endif
 	docker pull $(RUCIO_IMAGE)
-	docker tag openalto/rucio-dev $(RUCIO_IMAGE)
+	docker tag $(RUCIO_IMAGE) openalto/rucio-dev
 
 prebuilt-xrootd:
 ifeq ($(shell docker images -q -f 'reference=openalto/xrootd'))
@@ -17,7 +17,7 @@ ifeq ($(shell docker images -q -f 'reference=openalto/xrootd'))
 	docker rmi openalto/xrootd
 endif
 	docker pull $(XROOTD_IMAGE)
-	docker tag openalto/xrootd $(XROOTD_IMAGE)
+	docker tag $(XROOTD_IMAGE) openalto/xrootd
 
 prebuilt-fts:
 ifeq ($(shell docker images -q -f 'reference=openalto/fts'))
@@ -25,7 +25,7 @@ ifeq ($(shell docker images -q -f 'reference=openalto/fts'))
 	docker rmi openalto/fts
 endif
 	docker pull $(FTS_IMAGE)
-	docker tag openalto/fts $(FTS_IMAGE)
+	docker tag $(FTS_IMAGE) openalto/fts
 
 prebuilt-g2-mininet:
 ifeq ($(shell docker images -q -f 'reference=openalto/g2-mininet:minimal'))
@@ -33,4 +33,4 @@ ifeq ($(shell docker images -q -f 'reference=openalto/g2-mininet:minimal'))
 	docker rmi openalto/g2-mininet:minimal
 endif
 	docker pull $(MN_IMAGE)
-	docker tag openalto/g2-mininet:minimal $(MN_IMAGE)
+	docker tag $(MN_IMAGE) openalto/g2-mininet:minimal
