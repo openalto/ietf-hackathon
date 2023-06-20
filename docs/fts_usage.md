@@ -55,8 +55,7 @@ Expected results: You should be able to see `workflow/sc22-dev/docker/{static/st
 ```
 $ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml up -d
 $ docker-compose -f workflow/sc22-dev/docker/dynamic/dynamic-docker-compose.yml up -d
-$ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml \
-  exec mininet python3 /utils/rucio_dynamic_example.py --str "$(cat etc/sc22.yml)"
+$ docker-compose -f workflow/sc22-dev/docker/static/static-docker-compose.yml exec mininet python3 /utils/rucio_dynamic_example.py --str "$(cat etc/sc22.yml)"
 ```
 
 Expected results: You should be able to enter the mininet CLI. Try `pingall` to test connectivity between the hosts.
