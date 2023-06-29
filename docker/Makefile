@@ -40,7 +40,7 @@ update-g2-mininet:
 update-g2-mininet-minimal:
 	docker build -t openalto/g2-mininet:minimal -f g2-mininet/Dockerfile.minimal g2-mininet/
 
-update: upate-rucio update-g2-mininet-minimal update-fts
+update: update-rucio update-g2-mininet-minimal update-fts
 
 include prebuilt.mk
 
