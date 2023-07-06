@@ -4,7 +4,7 @@ FTS_IMAGE := fno2010/fts:3.12.0
 MN_IMAGE := fno2010/g2-mininet:minimal
 
 prebuilt-rucio:
-ifeq ($(shell docker images -q -f 'reference=openalto/rucio-dev'),)
+ifneq ($(shell docker images -q -f 'reference=openalto/rucio-dev'),)
 	docker tag openalto/rucio-dev openalto/rucio-dev:build
 	docker rmi openalto/rucio-dev
 endif
@@ -12,7 +12,7 @@ endif
 	docker tag $(RUCIO_IMAGE) openalto/rucio-dev
 
 prebuilt-xrootd:
-ifeq ($(shell docker images -q -f 'reference=openalto/xrootd'),)
+ifneq ($(shell docker images -q -f 'reference=openalto/xrootd'),)
 	docker tag openalto/xrootd openalto/xrootd:build
 	docker rmi openalto/xrootd
 endif
@@ -20,7 +20,7 @@ endif
 	docker tag $(XROOTD_IMAGE) openalto/xrootd
 
 prebuilt-fts:
-ifeq ($(shell docker images -q -f 'reference=openalto/fts'),)
+ifneq ($(shell docker images -q -f 'reference=openalto/fts'),)
 	docker tag openalto/fts openalto/fts:build
 	docker rmi openalto/fts
 endif
@@ -28,7 +28,7 @@ endif
 	docker tag $(FTS_IMAGE) openalto/fts
 
 prebuilt-g2-mininet:
-ifeq ($(shell docker images -q -f 'reference=openalto/g2-mininet:minimal'),)
+ifneq ($(shell docker images -q -f 'reference=openalto/g2-mininet:minimal'),)
 	docker tag openalto/g2-mininet:minimal openalto/g2-mininet:minimal-build
 	docker rmi openalto/g2-mininet:minimal
 endif
